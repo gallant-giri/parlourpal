@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="module">
+    <h2>Database Error</h2>
+    <div class="description">
+        <p><strong>Error:</strong> {{ error_message }}</p>
+        <p>This error is likely due to foreign key constraint issues in the database.</p>
+        
+        <h3>To fix this issue:</h3>
+        <ol>
+            <li>Run the cleanup command: <code>python manage.py cleanup_orphaned_data</code></li>
+            <li>Or run the database fix script: <code>python fix_database.py</code></li>
+            <li>Restart the Django development server</li>
+        </ol>
+        
+        <p><strong>Note:</strong> This is a temporary error page. The issue will be resolved after running the cleanup commands.</p>
+    </div>
+</div>
+{% endblock %} 

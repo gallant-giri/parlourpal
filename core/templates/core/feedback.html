@@ -1,208 +1,580 @@
-{% extends "base.html" %}
+{% extends "core/base.html" %}
+{% load static %}
+
 {% block title %}Feedback - ParlorPal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feedback-container {
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        min-height: calc(100vh - 160px);
+    }
+
+    .feedback-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .feedback-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .feedback-title {
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .feedback-subtitle {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        color: var(--text-gray);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .feedback-form-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(168, 139, 235, 0.25);
+    }
+
+    .input-group-text {
+        background: var(--bg-light);
+        border: 2px solid #e9ecef;
+        border-right: none;
+        color: var(--text-gray);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus + .input-group-text,
+    .input-group .form-control:focus {
+        border-color: var(--primary-color);
+    }
+
+    .rating-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 0.25rem;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #ddd;
+        transition: var(--transition);
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+
+    .rating-text {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    .category-section {
+        background: var(--bg-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-check-label {
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text-dark);
+        transition: var(--transition);
+    }
+
+    .form-check-label:hover {
+        color: var(--primary-color);
+    }
+
+    .feedback-textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .char-count {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        text-align: right;
+    }
+
+    .submit-feedback-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+        color: var(--white);
+        padding: 0.875rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .submit-feedback-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        color: var(--white);
+    }
+
+    .submit-feedback-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .success-message {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: slideUp 0.5s ease;
+    }
+
+    .benefits-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .benefits-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .benefit-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .benefit-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .benefit-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .benefit-description {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .contact-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .contact-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .contact-email {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .contact-email:hover {
+        color: var(--accent-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .feedback-container {
+            padding: 1rem 0;
+        }
+
+        .feedback-form-card {
+            padding: 1.5rem;
+        }
+
+        .rating-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .category-section {
+            padding: 1rem;
+        }
+
+        .benefits-section {
+            padding: 1.5rem;
+        }
+
+        .feedback-icon {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .feedback-form-card {
+            padding: 1rem;
+        }
+
+        .feedback-title {
+            font-size: 1.8rem;
+        }
+
+        .feedback-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+        }
+
+        .star-rating label {
+            font-size: 1.25rem;
+        }
+
+        .benefits-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="feedback-container">
     <div class="container">
-        <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="feedback-header text-center">
-                    <div class="feedback-icon-large">
-                        <i class="bi bi-chat-heart"></i>
-                    </div>
-                    <h1 class="feedback-title">We Value Your Feedback</h1>
-                    <p class="feedback-subtitle">
-                        Help us improve ParlorPal by sharing your thoughts and experiences
-                    </p>
-                </div>
+        <!-- Header -->
+        <div class="feedback-header">
+            <div class="feedback-icon">
+                <i class="bi bi-chat-heart"></i>
             </div>
+            <h1 class="feedback-title">💬 We Value Your Feedback</h1>
+            <p class="feedback-subtitle">
+                Help us improve ParlorPal by sharing your thoughts and experiences. 
+                Your feedback shapes the future of our platform.
+            </p>
         </div>
 
-        <!-- Feedback Form Section -->
+        <!-- Main Form -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="feedback-card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-pencil-square me-2"></i>Share Your Experience
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="feedbackForm" method="post" class="feedback-form">
-                            {% csrf_token %}
+                <div class="feedback-form-card">
+                    <form id="feedbackForm" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Name and Email -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="bi bi-person me-1"></i>
+                                    Your Name
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="name" 
+                                           name="name" 
+                                           placeholder="Enter your name"
+                                           value="{{ user.get_full_name|default:user.username }}"
+                                           required>
+                                </div>
+                            </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="name" class="form-label">Your Name</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="bi bi-person"></i>
-                                        </span>
-                                        <input type="text" 
-                                               class="form-control" 
-                                               id="name" 
-                                               name="name" 
-                                               placeholder="Enter your name"
-                                               value="{{ user.get_full_name|default:user.username }}"
-                                               required>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="bi bi-envelope"></i>
-                                        </span>
-                                        <input type="email" 
-                                               class="form-control" 
-                                               id="email" 
-                                               name="email" 
-                                               placeholder="your@email.com"
-                                               value="{{ user.email }}"
-                                               required>
-                                    </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    Email Address
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="email" 
+                                           name="email" 
+                                           placeholder="your@email.com"
+                                           value="{{ user.email }}"
+                                           required>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Overall Rating</label>
-                                <div class="rating-section">
-                                    <div class="star-rating">
-                                        <input type="radio" id="star5" name="rating" value="5">
-                                        <label for="star5" class="star">
-                                            <i class="bi bi-star-fill"></i>
-                                        </label>
-                                        
-                                        <input type="radio" id="star4" name="rating" value="4">
-                                        <label for="star4" class="star">
-                                            <i class="bi bi-star-fill"></i>
-                                        </label>
-                                        
-                                        <input type="radio" id="star3" name="rating" value="3">
-                                        <label for="star3" class="star">
-                                            <i class="bi bi-star-fill"></i>
-                                        </label>
-                                        
-                                        <input type="radio" id="star2" name="rating" value="2">
-                                        <label for="star2" class="star">
-                                            <i class="bi bi-star-fill"></i>
-                                        </label>
-                                        
-                                        <input type="radio" id="star1" name="rating" value="1">
-                                        <label for="star1" class="star">
-                                            <i class="bi bi-star-fill"></i>
-                                        </label>
-                                    </div>
-                                    <span class="rating-text">Click to rate your experience</span>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="category" class="form-label">Feedback Category</label>
-                                <select class="form-select" id="category" name="category" required>
-                                    <option value="">Select a category</option>
-                                    <option value="ai_quality">AI Content Quality</option>
-                                    <option value="user_interface">User Interface</option>
-                                    <option value="features">Features & Functionality</option>
-                                    <option value="performance">Performance & Speed</option>
-                                    <option value="support">Customer Support</option>
-                                    <option value="suggestion">Feature Suggestion</option>
-                                    <option value="bug">Bug Report</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Your Feedback</label>
-                                <textarea class="form-control feedback-textarea" 
-                                          id="message" 
-                                          name="message" 
-                                          rows="5" 
-                                          placeholder="Tell us about your experience with ParlorPal. What do you love? What could be improved? Any suggestions?"
-                                          required></textarea>
-                                <div class="form-text">
-                                    <span id="charCount">0</span>/1000 characters
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
-                                    <label class="form-check-label" for="newsletter">
-                                        Keep me updated about ParlorPal improvements and new features
+                        <!-- Rating -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-star me-1"></i>
+                                Overall Rating
+                            </label>
+                            <div class="rating-section">
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5">
+                                    <label for="star5" class="star">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star4" name="rating" value="4">
+                                    <label for="star4" class="star">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3" class="star">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star2" name="rating" value="2">
+                                    <label for="star2" class="star">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star1" name="rating" value="1">
+                                    <label for="star1" class="star">
+                                        <i class="bi bi-star-fill"></i>
                                     </label>
                                 </div>
+                                <span class="rating-text">Click to rate your experience</span>
                             </div>
+                        </div>
 
-                            <button type="submit" class="btn btn-primary w-100 feedback-submit-btn">
-                                <i class="bi bi-send me-2"></i>
-                                Send Feedback
-                                <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                        <!-- Categories -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-tags me-1"></i>
+                                Feedback Categories
+                                <span class="text-muted">(Select all that apply)</span>
+                            </label>
+                            <div class="category-section">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="ai_quality" name="categories" value="ai_quality">
+                                            <label class="form-check-label" for="ai_quality">
+                                                <i class="bi bi-robot me-1"></i>AI Content Quality
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="user_interface" name="categories" value="user_interface">
+                                            <label class="form-check-label" for="user_interface">
+                                                <i class="bi bi-layout-text-window me-1"></i>User Interface
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="features" name="categories" value="features">
+                                            <label class="form-check-label" for="features">
+                                                <i class="bi bi-gear me-1"></i>Features & Functionality
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="performance" name="categories" value="performance">
+                                            <label class="form-check-label" for="performance">
+                                                <i class="bi bi-speedometer2 me-1"></i>Performance & Speed
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="support" name="categories" value="support">
+                                            <label class="form-check-label" for="support">
+                                                <i class="bi bi-headset me-1"></i>Customer Support
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="suggestion" name="categories" value="suggestion">
+                                            <label class="form-check-label" for="suggestion">
+                                                <i class="bi bi-lightbulb me-1"></i>Feature Suggestion
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="bug" name="categories" value="bug">
+                                            <label class="form-check-label" for="bug">
+                                                <i class="bi bi-bug me-1"></i>Bug Report
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="other" name="categories" value="other">
+                                            <label class="form-check-label" for="other">
+                                                <i class="bi bi-three-dots me-1"></i>Other
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb me-1"></i>
+                                You can select multiple categories if your feedback covers different areas
+                            </div>
+                        </div>
 
-        <!-- Success Message -->
-        <div class="row justify-content-center mt-4">
-            <div class="col-lg-8">
-                <div class="alert alert-success feedback-success d-none" role="alert">
-                    <div class="text-center">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        <strong>Thank you for your feedback!</strong> We appreciate you taking the time to help us improve ParlorPal.
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label for="message" class="form-label">
+                                <i class="bi bi-chat-text me-1"></i>
+                                Your Feedback
+                            </label>
+                            <textarea class="form-control feedback-textarea" 
+                                      id="message" 
+                                      name="message" 
+                                      rows="5" 
+                                      placeholder="Tell us about your experience with ParlorPal. What do you love? What could be improved? Any suggestions?"
+                                      required></textarea>
+                            <div class="char-count">
+                                <span id="charCount">0</span>/1000 characters
+                            </div>
+                        </div>
 
-        <!-- Why Feedback Matters Section -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="why-feedback-section">
-                    <h4 class="text-center mb-4">Why Your Feedback Matters</h4>
+                        <!-- Newsletter -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                                <label class="form-check-label" for="newsletter">
+                                    <i class="bi bi-bell me-1"></i>
+                                    Keep me updated about ParlorPal improvements and new features
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" id="feedback_submit_btn" class="btn submit-feedback-btn">
+                            <i class="bi bi-send me-2"></i>
+                            <span class="btn-text">Send Feedback</span>
+                            <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Success Message -->
+                {% if messages %}
+                <div class="success-message">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Thank you for your feedback!</strong> We appreciate you taking the time to help us improve ParlorPal.
+                </div>
+                {% endif %}
+
+                <!-- Benefits Section -->
+                <div class="benefits-section">
+                    <h4 class="benefits-title">
+                        <i class="bi bi-heart me-2"></i>
+                        Why Your Feedback Matters
+                    </h4>
                     <div class="row">
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="feedback-benefit">
-                                <i class="bi bi-lightbulb-fill"></i>
-                                <h6>Improve Features</h6>
-                                <p>Your insights help us enhance existing features and build new ones that truly serve your needs.</p>
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="bi bi-lightbulb"></i>
+                                </div>
+                                <h6 class="benefit-title">Improve Features</h6>
+                                <p class="benefit-description">
+                                    Your insights help us enhance existing features and build new ones that truly serve your needs.
+                                </p>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="feedback-benefit">
-                                <i class="bi bi-graph-up-arrow"></i>
-                                <h6>Better AI Quality</h6>
-                                <p>Feedback about AI-generated content helps us improve the quality and relevance of suggestions.</p>
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <h6 class="benefit-title">Better AI Quality</h6>
+                                <p class="benefit-description">
+                                    Feedback about AI-generated content helps us improve the quality and relevance of suggestions.
+                                </p>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <div class="feedback-benefit">
-                                <i class="bi bi-heart-fill"></i>
-                                <h6>Community Focus</h6>
-                                <p>We're building ParlorPal for salon professionals like you, and your voice shapes our direction.</p>
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <h6 class="benefit-title">Community Focus</h6>
+                                <p class="benefit-description">
+                                    We're building ParlorPal for business professionals like you, and your voice shapes our direction.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Contact Info -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="contact-section text-center">
-                    <h6 class="mb-3">Need immediate help?</h6>
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <h6 class="contact-title">
+                        <i class="bi bi-question-circle me-2"></i>
+                        Need immediate help?
+                    </h6>
                     <p class="mb-2">
                         <i class="bi bi-envelope me-2"></i>
-                        Email us at <a href="mailto:support@parlorpal.com" class="text-decoration-none">support@parlorpal.com</a>
+                        Email us at <a href="mailto:support@parlorpal.com" class="contact-email">support@parlorpal.com</a>
                     </p>
-                    <p class="text-muted">
+                    <p class="text-muted mb-0">
                         We typically respond within 24 hours
                     </p>
                 </div>
@@ -210,4 +582,54 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feedbackForm = document.getElementById("feedbackForm");
+    const feedbackSubmitBtn = document.getElementById("feedback_submit_btn");
+    const btnText = feedbackSubmitBtn.querySelector(".btn-text");
+    const spinner = feedbackSubmitBtn.querySelector(".spinner-border");
+    const messageTextarea = document.getElementById("message");
+    const charCount = document.getElementById("charCount");
+
+    // Character count
+    if (messageTextarea && charCount) {
+        messageTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            if (count > 900) {
+                charCount.style.color = '#dc3545';
+            } else if (count > 800) {
+                charCount.style.color = '#ffc107';
+            } else {
+                charCount.style.color = 'var(--text-gray)';
+            }
+        });
+    }
+
+    // Form submission handling
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', function(e) {
+            // Check if at least one category is selected
+            const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+            if (selectedCategories.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one feedback category.');
+                return;
+            }
+            
+            // Disable button
+            feedbackSubmitBtn.disabled = true;
+            
+            // Show spinner and change text
+            spinner.classList.remove('d-none');
+            btnText.textContent = 'Sending...';
+            
+            // Add loading class
+            feedbackSubmitBtn.classList.add('btn-loading');
+        });
+    }
+});
+</script>
 {% endblock %}

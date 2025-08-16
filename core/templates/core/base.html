@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ParlorPal - AI Marketing for Beauty Salons{% endblock %}</title>
+    <title>{% block title %}ParlorPal - AI Marketing for All Businesses{% endblock %}</title>
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top custom-navbar">
         <div class="container">
             <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}">
-                <i class="bi bi-scissors me-2"></i>
+                <i class="bi bi-graph-up-arrow me-2"></i>
                 <span class="brand-text">ParlorPal</span>
             </a>
 
@@ -44,25 +44,65 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
+                        <!-- Dashboard link for all authenticated users -->
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
                                 <i class="bi bi-house-door me-1"></i>Dashboard
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'ai_suggestions' %}">
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'chatbot' or request.resolver_match.url_name == 'ai_suggestions' %}active{% endif %}" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-magic me-1"></i>AI Assistant
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="aiDropdown">
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'chatbot' %}active{% endif %}" href="{% url 'chatbot' %}"><i class="bi bi-robot me-1"></i>Chatbot</a></li>
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'ai_suggestions' %}active{% endif %}" href="{% url 'ai_suggestions' %}"><i class="bi bi-lightbulb me-1"></i>AI Content Generator</a></li>
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'email_subjects' %}active{% endif %}" href="{% url 'email_subjects' %}"><i class="bi bi-envelope me-1"></i>Email Subject Line Generator</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'generate_poster' %}">
-                                <i class="bi bi-image me-1"></i>Generate Poster
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="mediaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Generate Media
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="mediaDropdown">
+                                <li><a class="dropdown-item" href="{% url 'generate_poster' %}">Generate Poster</a></li>
+                                <li><a class="dropdown-item" href="{% url 'generate_video' %}">Generate Video</a></li>
+                            </ul>
                         </li>
 
+                        <!-- Admin Tools -->
+                        {% if user.is_staff %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'manage_festivals' or request.resolver_match.url_name == 'email_templates' or request.resolver_match.url_name == 'preview_verification_email' or request.resolver_match.url_name == 'preview_festival_notification' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-tools me-1"></i>Admin Tools
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'manage_festivals' %}active{% endif %}" href="{% url 'manage_festivals' %}">
+                                    <i class="bi bi-calendar-event me-1"></i>Manage Festivals
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'email_templates' %}active{% endif %}" href="{% url 'email_templates' %}">
+                                    <i class="bi bi-collection me-1"></i>Email Templates
+                                </a></li>
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'preview_verification_email' %}active{% endif %}" href="{% url 'preview_verification_email' %}">
+                                    <i class="bi bi-envelope-check me-1"></i>Verification Email
+                                </a></li>
+                                <li><a class="dropdown-item {% if request.resolver_match.url_name == 'preview_festival_notification' %}active{% endif %}" href="{% url 'preview_festival_notification' %}">
+                                    <i class="bi bi-bell me-1"></i>Festival Notification
+                                </a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'feedback' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'feedback' %}active{% endif %}" href="{% url 'feedback' %}">
                                 <i class="bi bi-chat-heart me-1"></i>Feedback
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+                                <i class="bi bi-person-circle me-1"></i>Profile
                             </a>
                         </li>
                         <li class="nav-item">
@@ -72,12 +112,17 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                                <i class="bi bi-house-door me-1"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
                                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary text-white px-3 ms-2" href="{% url 'register' %}">
+                            <a class="nav-link auth-btn {% if request.resolver_match.url_name == 'register' %}active{% endif %}" href="{% url 'register' %}">
                                 <i class="bi bi-person-plus me-1"></i>Register
                             </a>
                         </li>
@@ -92,16 +137,205 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Floating Chatbot Widget (for logged-in users) -->
+    {% if user.is_authenticated %}
+    <style>
+        #floatingChatbotBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1050;
+            background: linear-gradient(135deg, #7c3aed, #818cf8);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 4px 16px rgba(60,60,120,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        #floatingChatbotBtn:hover {
+            box-shadow: 0 8px 24px rgba(60,60,120,0.18);
+        }
+        #floatingChatbotWindow {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 2rem;
+            z-index: 1051;
+            width: 340px;
+            max-width: 95vw;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(60,60,120,0.18);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #floatingChatbotHeader {
+            background: linear-gradient(135deg, #7c3aed, #818cf8);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #floatingChatbotHeader .expand-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        #floatingChatbotBody {
+            background: #f8fafc;
+            padding: 1rem;
+            min-height: 180px;
+            max-height: 260px;
+            overflow-y: auto;
+            font-size: 0.98rem;
+        }
+        #floatingChatbotFooter {
+            background: #f3f4f6;
+            padding: 0.5rem 0.75rem;
+        }
+        .mini-chat-row {
+            display: flex;
+            margin-bottom: 0.4rem;
+        }
+        .mini-chat-bubble {
+            padding: 0.5rem 0.9rem;
+            border-radius: 1.1rem;
+            max-width: 80%;
+            white-space: pre-line;
+            word-break: break-word;
+            font-size: 0.97rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            animation: fadeIn 0.3s;
+        }
+        .mini-chat-row.user { justify-content: flex-end; }
+        .mini-chat-row.bot { justify-content: flex-start; }
+        .mini-chat-bubble.user {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #3730a3;
+        }
+        .mini-chat-bubble.bot {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: none; }
+        }
+    </style>
+    <button id="floatingChatbotBtn" title="Ask ParlorPal Assistant">
+        <i class="bi bi-robot"></i>
+    </button>
+    <div id="floatingChatbotWindow">
+        <div id="floatingChatbotHeader">
+            <span><i class="bi bi-robot me-1"></i>ParlorPal Assistant</span>
+            <div>
+                <button class="expand-btn" title="Open full chat" onclick="window.location.href='{% url 'chatbot' %}'"><i class="bi bi-arrows-fullscreen"></i></button>
+                <button class="expand-btn" title="Close" onclick="toggleFloatingChatbot(false)"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div id="floatingChatbotBody"></div>
+        <div id="floatingChatbotFooter">
+            <form id="floatingChatbotForm" class="d-flex align-items-center" autocomplete="off">
+                <input type="text" id="floatingChatbotInput" class="form-control form-control-sm me-2" placeholder="Ask about ParlorPal..." required>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-send"></i></button>
+            </form>
+            <div id="floatingChatbotLoading" class="text-center mt-1" style="display:none;">
+                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                <span class="ms-1 text-muted">AI is thinking...</span>
+            </div>
+            <div id="floatingChatbotError" class="alert alert-danger mt-1 py-1 px-2" style="display:none;font-size:0.95em;"></div>
+        </div>
+    </div>
+    <script>
+    function toggleFloatingChatbot(show) {
+        const win = document.getElementById('floatingChatbotWindow');
+        win.style.display = show ? 'flex' : 'none';
+    }
+    document.getElementById('floatingChatbotBtn').onclick = function() {
+        toggleFloatingChatbot(true);
+        setTimeout(function() {
+            document.getElementById('floatingChatbotInput').focus();
+        }, 200);
+    };
+    // Hide on page load
+    toggleFloatingChatbot(false);
+
+    // Mini chat logic
+    const miniForm = document.getElementById('floatingChatbotForm');
+    const miniInput = document.getElementById('floatingChatbotInput');
+    const miniBody = document.getElementById('floatingChatbotBody');
+    const miniLoading = document.getElementById('floatingChatbotLoading');
+    const miniError = document.getElementById('floatingChatbotError');
+    function appendMiniMessage(text, sender) {
+        const row = document.createElement('div');
+        row.className = 'mini-chat-row ' + sender;
+        const bubble = document.createElement('div');
+        bubble.className = 'mini-chat-bubble ' + sender;
+        bubble.textContent = text;
+        row.appendChild(bubble);
+        miniBody.appendChild(row);
+        setTimeout(function() {
+            miniBody.scrollTop = miniBody.scrollHeight;
+        }, 100);
+    }
+    miniForm.onsubmit = function(e) {
+        e.preventDefault();
+        const userMsg = miniInput.value.trim();
+        if (!userMsg) return;
+        appendMiniMessage(userMsg, 'user');
+        miniInput.value = '';
+        miniError.style.display = 'none';
+        miniLoading.style.display = 'block';
+        // Send AJAX request to /chatbot/ endpoint
+        fetch('{% url 'chatbot' %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({ message: userMsg })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            miniLoading.style.display = 'none';
+            if (data.success) {
+                appendMiniMessage(data.reply, 'bot');
+            } else {
+                miniError.textContent = data.error || 'Something went wrong.';
+                miniError.style.display = 'block';
+            }
+        })
+        .catch(function(err) {
+            miniLoading.style.display = 'none';
+            miniError.textContent = 'Network error. Please try again.';
+            miniError.style.display = 'block';
+        });
+    };
+    </script>
+    {% endif %}
+
     <!-- Footer -->
     <footer class="footer mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
                     <h5 class="brand-text">ParlorPal</h5>
-                    <p class="text-muted">AI-powered marketing solutions for beauty salons and parlors.</p>
+                    <p class="text-muted">AI-powered marketing solutions for businesses of all types.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">© 2025 ParlorPal. Crafted with ❤️ for beauty professionals.</p>
+                    <p class="text-muted mb-0">© 2025 ParlorPal. Crafted with ❤️ for business owners.</p>
                 </div>
             </div>
         </div>

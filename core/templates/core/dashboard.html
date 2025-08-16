@@ -7,19 +7,71 @@
 {% block content %}
 <div class="dashboard-container">
     <div class="container">
+        {% if suggestion %}
+        <div class="alert alert-info alert-dismissible fade show my-3" role="alert" id="suggestionBanner">
+            <i class="bi bi-lightbulb me-2"></i>
+            <span>{{ suggestion }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
         <!-- Welcome Header -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="welcome-card">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h1 class="welcome-title">
-                                Welcome back, {{ user.username|default:"Beauty Professional" }}! 
-                                <i class="bi bi-heart-fill text-danger ms-2"></i>
-                            </h1>
-                            <p class="welcome-subtitle">
-                                Ready to create amazing marketing content for your {{ profile.business_name|default:"Business" }}?
-                            </p>
+                            <div class="welcome-content">
+                                <div class="welcome-header">
+                                    {% if profile and profile.image %}
+                                        <img src="{{ profile.image.url }}" alt="{{ profile.business_name }}" class="business-logo">
+                                    {% endif %}
+                                    <h1 class="welcome-title">
+                                        Welcome back, {{ user.username|default:"Business Professional" }}! 
+                                        <i class="bi bi-heart-fill text-danger ms-2"></i>
+                                    </h1>
+                                </div>
+                                <p class="welcome-subtitle">
+                                    {% if profile %}
+                                    Ready to create amazing marketing content for your {{ profile.business_name }}?
+                                    {% else %}
+                                    Welcome to ParlorPal! Let's set up your business profile to get started.
+                                    {% endif %}
+                                </p>
+                                
+                                <!-- Email Verification Status -->
+                                <div class="email-status-section mt-3">
+                                    {% if user.email_verified %}
+                                        <div class="status-badge verified">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span>Email Verified</span>
+                                        </div>
+                                        <div class="notification-toggle">
+                                            <form method="post" action="{% url 'toggle_notifications' %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="toggle-btn {% if user.notifications_enabled %}enabled{% else %}disabled{% endif %}">
+                                                    <i class="bi bi-bell"></i>
+                                                    Festival Notifications: {% if user.notifications_enabled %}ON{% else %}OFF{% endif %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% else %}
+                                        <div class="status-badge unverified">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            <span>Email Not Verified</span>
+                                        </div>
+                                        <div class="verification-actions">
+                                            <form method="post" action="{% url 'resend_verification' %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-envelope"></i>
+                                                    Resend Verification Email
+                                                </button>
+                                            </form>
+                                            <small class="text-muted d-block mt-1">Verify your email to enable festival notifications!</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-4 text-md-end">
                             <div class="dashboard-stats">
@@ -34,41 +86,84 @@
             </div>
         </div>
 
-        <!-- Business Profile Section -->
+        <!-- AI Guide Section -->
         <div class="row mb-4">
             <div class="col-lg-8">
-                <div class="profile-card">
+                <div class="guide-card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="bi bi-building me-2"></i>Your Business Profile
+                            <i class="bi bi-stars me-2"></i>🚀 Your AI Marketing Adventure Guide
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 text-center mb-3">
-                                <div class="business-image">
-                                    
-                                    {% if profile.image %}
-                                        <img src="{{ business.image.url }}" alt="{{ business.name }}" class="img-fluid rounded">
-                                    {% else %}
-                                        <div class="business-placeholder">
-                                            <i class="bi bi-shop"></i>
-                                        </div>
-                                    {% endif %}
+                        <div class="guide-steps">
+                            <!-- Step 1: Generate Captions -->
+                            <div class="guide-step active">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h6 class="step-title">
+                                        <i class="bi bi-magic me-2"></i>✨ Create Viral Captions
+                                    </h6>
+                                    <p class="step-description">
+                                        Tell our AI what you want to promote (services, offers, events) and watch it create 
+                                        <strong>engaging, emoji-packed captions</strong> that your customers will love! 
+                                        Perfect for Instagram, Facebook, and WhatsApp.
+                                    </p>
+                                    <div class="step-tips">
+                                        <span class="tip-badge">💡 Pro Tip: Be specific about your offer for better results!</span>
+                                    </div>
+                                    <a href="{% url 'ai_suggestions' %}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-rocket me-1"></i>Start Creating
+                                    </a>
                                 </div>
                             </div>
-                            <div class="col-md-9">
-                                <h4 class="business-name">{{ profile.business_name|default:"Your Amazing Salon" }}</h4>
-                                <p class="business-description">
-                                    {{ profile.description|default:"A beautiful salon dedicated to making clients look and feel their best. We offer premium hair styling, nail care, and beauty treatments in a relaxing atmosphere." }}
-                                </p>
-                                <div class="business-meta">
-                                    <span class="badge bg-primary">
-                                        <i class="bi bi-clock me-1"></i>Member since {{ user.date_joined|date:"M Y" }}
-                                    </span>
-                                    <span class="badge bg-success ms-2">
-                                        <i class="bi bi-check-circle me-1"></i>Profile Active
-                                    </span>
+
+                            <!-- Step 2: Generate Posters -->
+                            <div class="guide-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h6 class="step-title">
+                                        <i class="bi bi-image me-2"></i>🎨 Design Stunning Posters
+                                    </h6>
+                                    <p class="step-description">
+                                        Describe your promotion or event, and our AI will generate 
+                                        <strong>professional posters</strong> that grab attention! 
+                                        Perfect for social media, WhatsApp status, and print materials.
+                                    </p>
+                                    <div class="step-tips">
+                                        <span class="tip-badge">🎯 Pro Tip: Mention your offer details for targeted designs!</span>
+                                    </div>
+                                    <a href="{% url 'generate_poster' %}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-palette me-1"></i>Design Now
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Share & Engage -->
+                            <div class="guide-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h6 class="step-title">
+                                        <i class="bi bi-share me-2"></i>📱 Share & Watch Growth
+                                    </h6>
+                                    <p class="step-description">
+                                        Copy your AI-generated content and share it across your social media platforms. 
+                                        <strong>Track engagement</strong> and watch your customer base grow! 
+                                        The more you use it, the better it gets at understanding your style.
+                                    </p>
+                                    <div class="step-tips">
+                                        <span class="tip-badge">📈 Pro Tip: Post consistently for best results!</span>
+                                    </div>
+                                    <div class="step-stats">
+                                        <div class="stat-item">
+                                            <i class="bi bi-graph-up text-success"></i>
+                                            <span>Average 3x more engagement</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <i class="bi bi-clock text-primary"></i>
+                                            <span>Save 10+ hours weekly</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -84,22 +179,78 @@
                         </h5>
                     </div>
                     <div class="card-body">
+                        <!-- Email Verification Actions -->
+                        {% if not user.email_verified %}
+                        <a href="{% url 'resend_verification' %}" class="quick-action-btn">
+                            <i class="bi bi-envelope-check"></i>
+                            <span>Verify Email</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'toggle_notifications' %}" class="quick-action-btn">
+                            <i class="bi bi-bell"></i>
+                            <span>{% if user.notifications_enabled %}Disable{% else %}Enable{% endif %} Notifications</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Festival Management (Admin Only) -->
+                        {% if user.is_staff %}
+                        <a href="{% url 'manage_festivals' %}" class="quick-action-btn">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Manage Festivals</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        <a href="{% url 'preview_verification_email' %}" class="quick-action-btn">
+                            <i class="bi bi-envelope"></i>
+                            <span>Preview Verification Email</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        <a href="{% url 'preview_festival_notification' %}" class="quick-action-btn">
+                            <i class="bi bi-bell"></i>
+                            <span>Preview Festival Email</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        <a href="{% url 'email_templates' %}" class="quick-action-btn">
+                            <i class="bi bi-collection"></i>
+                            <span>All Email Templates</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Core Features -->
+                        {% if profile %}
                         <a href="{% url 'ai_suggestions' %}" class="quick-action-btn">
                             <i class="bi bi-magic"></i>
                             <span>Generate AI Content</span>
                             <i class="bi bi-arrow-right ms-auto"></i>
                         </a>
-                        <a href="{% url 'generate_poster' %}" class="quick-action-btn mt-2">
+                        <a href="{% url 'generate_poster' %}" class="quick-action-btn">
                             <i class="bi bi-image"></i>
                             <span>Generate Poster</span>
                             <i class="bi bi-arrow-right ms-auto"></i>
                         </a>
-
-                        <a href="#" class="quick-action-btn">
+                        <a href="{% url 'insights' %}" class="quick-action-btn">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>View Insights</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'ai_suggestions' %}" class="quick-action-btn">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create Business Profile</span>
+                            <i class="bi bi-arrow-right ms-auto"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Profile Management -->
+                        <a href="{% url 'profile' %}" class="quick-action-btn">
                             <i class="bi bi-person-gear"></i>
                             <span>Edit Profile</span>
                             <i class="bi bi-arrow-right ms-auto"></i>
                         </a>
+                        
+                        <!-- Feedback -->
                         <a href="{% url 'feedback' %}" class="quick-action-btn">
                             <i class="bi bi-chat-heart"></i>
                             <span>Give Feedback</span>
@@ -110,98 +261,60 @@
             </div>
         </div>
 
-        <!-- Marketing Tools Section -->
+        <!-- Quick Stats -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="tools-section">
+                <div class="stats-section">
                     <h3 class="section-title">
-                        <i class="bi bi-tools me-2"></i>Marketing Tools
+                        <i class="bi bi-graph-up me-2"></i>Your Progress
                     </h3>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="tool-card">
-                                <div class="tool-icon">
-                                    <i class="bi bi-robot"></i>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-calendar-check"></i>
                                 </div>
-                                <h5 class="tool-title">AI Content Generator</h5>
-                                <p class="tool-description">
-                                    Create engaging social media posts, promotional content, and marketing copy tailored to your salon.
-                                </p>
-                                <a href="{% url 'ai_suggestions' %}" class="btn btn-primary">
-                                    Get Started <i class="bi bi-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <div class="tool-card">
-                                <div class="tool-icon">
-                                    <i class="bi bi-calendar-event"></i>
+                                <div class="stat-content">
+                                    <h4 class="stat-number">{{ user.date_joined|timesince }}</h4>
+                                    <p class="stat-label">Member Since</p>
                                 </div>
-                                <h5 class="tool-title">Campaign Planner</h5>
-                                <p class="tool-description">
-                                    Plan and schedule your marketing campaigns for maximum impact and customer engagement.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary">
-                                    Coming Soon <i class="bi bi-clock ms-1"></i>
-                                </a>
                             </div>
                         </div>
                         
-                        <div class="col-md-4 mb-3">
-                            <div class="tool-card">
-                                <div class="tool-icon">
-                                    <i class="bi bi-graph-up"></i>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-check-circle"></i>
                                 </div>
-                                <h5 class="tool-title">Analytics Dashboard</h5>
-                                <p class="tool-description">
-                                    Track your marketing performance and understand what resonates with your customers.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary">
-                                    Coming Soon <i class="bi bi-clock ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="row">
-            <div class="col-12">
-                <div class="activity-card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-clock-history me-2"></i>Recent Activity
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="bi bi-person-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h6>Account Created</h6>
-                                <p>Welcome to ParlorPal! Your account was successfully created.</p>
-                                <small class="text-muted">{{ user.date_joined|timesince }} ago</small>
+                                <div class="stat-content">
+                                    <h4 class="stat-number">{% if profile %}Active{% else %}Setup{% endif %}</h4>
+                                    <p class="stat-label">Profile Status</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="bi bi-shield-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h6>Profile Verified</h6>
-                                <p>Your business profile has been verified and is now active.</p>
-                                <small class="text-muted">{{ user.date_joined|timesince }} ago</small>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-magic"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h4 class="stat-number">Ready</h4>
+                                    <p class="stat-label">AI Tools</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="activity-placeholder">
-                            <i class="bi bi-hourglass-split"></i>
-                            <p>Start using our AI tools to see more activity here!</p>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-rocket"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h4 class="stat-number">24/7</h4>
+                                    <p class="stat-label">Support</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -209,4 +322,51 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Business Logo Styles */
+    .welcome-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .welcome-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .business-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+        box-shadow: 0 4px 12px rgba(168, 139, 235, 0.2);
+        transition: all 0.3s ease;
+        background: var(--white);
+    }
+    
+    .business-logo:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(168, 139, 235, 0.3);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .welcome-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .business-logo {
+            width: 40px;
+            height: 40px;
+        }
+    }
+</style>
+
 {% endblock %}

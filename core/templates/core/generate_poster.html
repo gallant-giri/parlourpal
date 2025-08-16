@@ -1,78 +1,595 @@
 {% extends "core/base.html" %}
+{% load static %}
+
 {% block title %}Generate Poster - ParlorPal{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <h2>Hello {{ user.username }} 👋</h2>
-    <p>Your business: <strong>{{ profile.business_name }}</strong></p>
-    <p>{{ profile.description }}</p>
+{% block extra_css %}
+<style>
+    .poster-container {
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        min-height: calc(100vh - 160px);
+    }
 
-    <form method="post" enctype="multipart/form-data" class="mt-4">
-        {% csrf_token %}
-        
-        <!-- Shared Fields -->
-        <div class="mb-3">
-            <label for="user_input" class="form-label">What do you want to promote today?</label>
-            <input type="text" name="user_input" id="user_input" class="form-control" placeholder="e.g., Bridal Offers, Monsoon Discounts" required>
+    .poster-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .poster-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .poster-title {
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .poster-subtitle {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        color: var(--text-gray);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .poster-form-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(168, 139, 235, 0.25);
+    }
+
+    .generate-poster-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+        color: var(--white);
+        padding: 0.875rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .generate-poster-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        color: var(--white);
+    }
+
+    .generate-poster-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .loading-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .loading-text {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-top: 1rem;
+    }
+
+    .result-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .result-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        text-align: center;
+    }
+
+    .result-title {
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .result-content {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .poster-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        margin-bottom: 1.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .download-btn {
+        background: var(--primary-color);
+        border: none;
+        color: var(--white);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .download-btn:hover {
+        background: var(--accent-color);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+
+    .regenerate-btn {
+        background: var(--bg-light);
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .regenerate-btn:hover {
+        background: var(--primary-color);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+
+    .tips-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .tips-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    .tip-item i {
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .poster-container {
+            padding: 1rem 0;
+        }
+
+        .poster-form-card {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .poster-icon {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .poster-form-card {
+            padding: 1rem;
+        }
+
+        .poster-title {
+            font-size: 1.8rem;
+        }
+
+        .poster-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+        }
+
+        .result-content {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="poster-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="poster-header">
+            <div class="poster-icon">
+                <i class="bi bi-image"></i>
+            </div>
+            <h1 class="poster-title">🎨 Generate Stunning Posters</h1>
+            <p class="poster-subtitle">
+                Create eye-catching promotional posters for any business in seconds. 
+                Perfect for retail, services, restaurants, salons, and all business types.
+            </p>
         </div>
 
+        <!-- Main Form -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="poster-form-card">
+                    <form id="posterForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+                        <!-- Promotion Name -->
         <div class="mb-3">
-            <label for="language" class="form-label">Choose Language:</label>
-            <select class="form-select" name="language" id="language">
+                            <label for="promotion_name" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                Promotion Name
+                            </label>
+                            <input type="text" 
+                                   name="promotion_name" 
+                                   id="promotion_name" 
+                                   class="form-control" 
+                                   placeholder="e.g., Mega Sale, Festival Bonanza, New Customer Special, Anniversary Celebration"
+                                   required>
+        </div>
+
+                        <!-- Offer Type -->
+        <div class="mb-3">
+                            <label for="offer_type" class="form-label">
+                                <i class="bi bi-gift me-1"></i>
+                                What do you want to promote?
+                            </label>
+            <select class="form-select" name="offer_type" id="offer_type" required>
+                                <option value="">-- Select Offer Type --</option>
+                                
+                                <!-- Discount Offers -->
+                                <optgroup label="🎯 Discount Offers">
+                <option value="50% OFF">50% OFF</option>
+                                    <option value="40% OFF">40% OFF</option>
+                                    <option value="30% OFF">30% OFF</option>
+                                    <option value="25% OFF">25% OFF</option>
+                <option value="20% OFF">20% OFF</option>
+                                    <option value="15% OFF">15% OFF</option>
+                                    <option value="10% OFF">10% OFF</option>
+                                    <option value="Flat ₹500 OFF">Flat ₹500 OFF</option>
+                                    <option value="Flat ₹300 OFF">Flat ₹300 OFF</option>
+                                    <option value="Flat ₹200 OFF">Flat ₹200 OFF</option>
+                                    <option value="Flat ₹100 OFF">Flat ₹100 OFF</option>
+                                    <option value="Flat ₹50 OFF">Flat ₹50 OFF</option>
+                                </optgroup>
+
+                                <!-- Buy & Get Offers -->
+                                <optgroup label="🎁 Buy & Get Offers">
+                <option value="Buy One Get One Free">Buy One Get One Free</option>
+                                    <option value="Buy Two Get One Free">Buy Two Get One Free</option>
+                                    <option value="Buy One Get 50% OFF">Buy One Get 50% OFF</option>
+                                    <option value="Buy One Get 30% OFF">Buy One Get 30% OFF</option>
+                                    <option value="Buy One Get 20% OFF">Buy One Get 20% OFF</option>
+                                </optgroup>
+
+                                <!-- Free Services -->
+                                <optgroup label="🆓 Free Services">
+                                    <option value="Free Consultation">Free Consultation</option>
+                                    <option value="Free Demo">Free Demo</option>
+                                    <option value="Free Trial">Free Trial</option>
+                                    <option value="Free Installation">Free Installation</option>
+                                    <option value="Free Delivery">Free Delivery</option>
+                                    <option value="Free Setup">Free Setup</option>
+                                    <option value="Free Training">Free Training</option>
+                                    <option value="Free Assessment">Free Assessment</option>
+                                </optgroup>
+
+                                <!-- Package Deals -->
+                                <optgroup label="📦 Package Deals">
+                                    <option value="Combo Package">Combo Package</option>
+                                    <option value="Starter Package">Starter Package</option>
+                                    <option value="Premium Package">Premium Package</option>
+                                    <option value="Family Package">Family Package</option>
+                                    <option value="Corporate Package">Corporate Package</option>
+                                    <option value="Student Package">Student Package</option>
+                                    <option value="Senior Citizen Package">Senior Citizen Package</option>
+                                </optgroup>
+
+                                <!-- Seasonal Offers -->
+                                <optgroup label="🎄 Seasonal Offers">
+                                    <option value="Diwali Special">Diwali Special</option>
+                                    <option value="Christmas Special">Christmas Special</option>
+                                    <option value="New Year Special">New Year Special</option>
+                                    <option value="Holi Special">Holi Special</option>
+                                    <option value="Raksha Bandhan Special">Raksha Bandhan Special</option>
+                                    <option value="Independence Day Special">Independence Day Special</option>
+                                    <option value="Republic Day Special">Republic Day Special</option>
+                                    <option value="Monsoon Special">Monsoon Special</option>
+                                    <option value="Summer Special">Summer Special</option>
+                                    <option value="Winter Special">Winter Special</option>
+                                </optgroup>
+
+                                <!-- Membership & Loyalty -->
+                                <optgroup label="👑 Membership & Loyalty">
+                                    <option value="VIP Membership">VIP Membership</option>
+                                    <option value="Premium Membership">Premium Membership</option>
+                                    <option value="Loyalty Program">Loyalty Program</option>
+                                    <option value="Referral Bonus">Referral Bonus</option>
+                                    <option value="Early Bird Offer">Early Bird Offer</option>
+                                    <option value="First Time Customer">First Time Customer</option>
+                                </optgroup>
+
+                                <!-- Business Specific -->
+                                <optgroup label="🏢 Business Specific">
+                                    <option value="Grand Opening">Grand Opening</option>
+                                    <option value="Anniversary Sale">Anniversary Sale</option>
+                                    <option value="Clearance Sale">Clearance Sale</option>
+                                    <option value="Stock Clearance">Stock Clearance</option>
+                                    <option value="End of Season Sale">End of Season Sale</option>
+                                    <option value="Flash Sale">Flash Sale</option>
+                                    <option value="Midnight Sale">Midnight Sale</option>
+                                    <option value="Weekend Special">Weekend Special</option>
+                                </optgroup>
+
+                                <!-- Custom Option -->
+                                <optgroup label="✏️ Custom">
+                                    <option value="Other">Other (Custom Offer)</option>
+                                </optgroup>
+            </select>
+        </div>
+
+                        <!-- Custom Offer -->
+        <div class="mb-3" id="custom_offer_div" style="display: none;">
+                            <label for="custom_offer" class="form-label">
+                                <i class="bi bi-pencil me-1"></i>
+                                Enter Your Custom Offer
+                            </label>
+                            <input type="text" 
+                                   name="custom_offer" 
+                                   id="custom_offer" 
+                                   class="form-control" 
+                                   placeholder="Describe your custom offer">
+        </div>
+
+                        <!-- Language -->
+        <div class="mb-3">
+                            <label for="language" class="form-label">
+                                <i class="bi bi-translate me-1"></i>
+                                Language
+                            </label>
+            <select class="form-select" name="language" id="language" required>
                 <option value="English" selected>English</option>
                 <option value="Kannada">Kannada</option>
+                <option value="Hindi">Hindi</option>
             </select>
         </div>
 
-        <div class="mb-3">
-            <label for="length" class="form-label">Select Length:</label>
-            <select class="form-select" name="length" id="length">
-                <option value="short">Short</option>
-                <option value="medium" selected>Medium</option>
-                <option value="long">Long</option>
-            </select>
-        </div>
-
-        <!-- Poster-Specific Fields -->
-        <hr>
-
-        <div class="mb-3">
-            <label for="heading" class="form-label">Poster Heading</label>
-            <input type="text" name="heading" id="heading" class="form-control" placeholder="e.g., Grand Opening, Monsoon Discount">
-        </div>
-
-        <div class="mb-3">
-            <label for="theme_color" class="form-label">Select Theme Color</label>
-            <input type="color" class="form-control form-control-color" name="theme_color" id="theme_color" value="#ff69b4">
-        </div>
-
-        <div class="mb-3">
-            <label for="font_size" class="form-label">Font Size</label>
-            <select class="form-select" name="font_size" id="font_size">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-            </select>
-        </div>
-
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" name="include_logo" id="include_logo">
-            <label class="form-check-label" for="include_logo">
-                Include business logo (if uploaded)
-            </label>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">
-            🖼️ Generate Poster
+                        <!-- Generate Button -->
+                        <button type="submit" id="generate_poster_btn" class="btn generate-poster-btn">
+                            <i class="bi bi-magic me-2"></i>
+                            <span class="btn-text">Generate Poster</span>
+                            <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
         </button>
     </form>
+                </div>
 
-    {% if poster_url %}
-    <div class="card mt-4 p-3">
-        <h5>Your Generated Poster:</h5>
-        <img src="{{ poster_url }}" alt="Generated Poster" class="img-fluid">
-        <a href="{{ poster_url }}" download class="btn btn-success mt-3">📥 Download Poster</a>
+                <!-- Loading Section -->
+                <div id="loadingSection" style="display: none;" class="loading-section">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <p class="loading-text">✨ Your perfect poster is being created... hang tight!</p>
     </div>
-    {% endif %}
+
+                <!-- Messages -->
+    {% if messages %}
+                <div class="mt-4">
+    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+    {% endfor %}
+                </div>
+{% endif %}
+
+                <!-- Generated Poster -->
+                {% if poster_url %}
+                <div class="result-card">
+                    <div class="result-header">
+                        <h5 class="result-title">
+                            <i class="bi bi-stars me-2"></i>
+                            Your Generated Poster
+                        </h5>
+                    </div>
+                    <div class="result-content">
+                        <img src="{{ poster_url }}" alt="Generated Poster" class="poster-image">
+                        <div class="action-buttons">
+                            <a href="{{ poster_url }}" download class="download-btn">
+                                <i class="bi bi-download"></i>
+                                Download Poster
+                            </a>
+                            <button class="download-btn" type="button" onclick="sharePoster()">
+                                <i class="bi bi-share"></i>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+          </div>
+            {% endif %}
+
+                <!-- Tips Section -->
+                <div class="tips-section mt-4">
+                    <h6 class="tips-title">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Tips for Better Posters
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Use clear, catchy promotion names</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Include specific offers and discounts</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Choose the right language for your audience</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Add urgency with limited time offers</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Highlight unique value propositions</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="tip-item">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Use seasonal themes when relevant</span>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('posterForm');
+    const submitButton = document.getElementById('generate_poster_btn');
+    const btnText = submitButton.querySelector('.btn-text');
+    const spinner = submitButton.querySelector('.spinner-border');
+    const loadingSection = document.getElementById('loadingSection');
+    const offerTypeSelect = document.getElementById('offer_type');
+    const customOfferDiv = document.getElementById('custom_offer_div');
+
+    // Form submission handling
+    if (form) {
+        form.addEventListener('submit', function() {
+            // Disable button
+            submitButton.disabled = true;
+
+            // Show spinner and change text
+            spinner.classList.remove('d-none');
+            btnText.textContent = 'Generating...';
+            
+            // Add loading class
+            submitButton.classList.add('btn-loading');
+            
+            // Show loading section
+        loadingSection.style.display = 'block';
+    });
+    }
+
+    // Show/hide custom offer field
+    if (offerTypeSelect) {
+        offerTypeSelect.addEventListener('change', function() {
+            customOfferDiv.style.display = this.value === 'Other' ? 'block' : 'none';
+        });
+    }
+
+    // Auto-scroll to generated poster if present
+    const posterResult = document.querySelector('.result-card');
+    if (posterResult) {
+        posterResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Share functionality
+    window.sharePoster = function() {
+        const posterUrl = "{{ poster_url|escapejs }}";
+        const shareText = 'Check out this poster I created on ParlorPal!';
+        if (navigator.share) {
+            navigator.share({
+                title: 'ParlorPal Poster',
+                text: shareText,
+                url: posterUrl
+            });
+        } else {
+            navigator.clipboard.writeText(posterUrl);
+            alert('Poster URL copied to clipboard! Share it on WhatsApp, Facebook, Instagram, or anywhere you like.');
+        }
+    }
+});
+</script>
 {% endblock %}

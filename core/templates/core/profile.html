@@ -1,0 +1,545 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Profile - ParlorPal{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="profile-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="profile-title">
+                                <i class="bi bi-person-circle me-2"></i>My Profile
+                            </h1>
+                            <p class="profile-subtitle">
+                                Manage your business profile and account settings
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="row mb-4">
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <!-- Profile Information -->
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-building me-2"></i>Business Profile
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data" id="profile_form">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-4 text-center mb-4">
+                                    <div class="profile-image-section">
+                                        {% if profile.image_url %}
+                                            <img src="{{ profile.image_url }}" alt="{{ profile.business_name }}" class="profile-image img-fluid rounded">
+                                        {% elif profile.image %}
+                                            <img src="{{ profile.image.url }}" alt="{{ profile.business_name }}" class="profile-image img-fluid rounded">
+                                        {% else %}
+                                            <div class="profile-placeholder">
+                                                <i class="bi bi-shop"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="mt-3">
+                                            {{ profile_form.image }}
+                                            <div class="form-text">Upload your business logo or image</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.email.id_for_label }}" class="form-label">
+                                            <i class="bi bi-envelope me-1"></i>Email Address
+                                        </label>
+                                        {{ profile_form.email }}
+                                        {% if profile_form.email.errors %}
+                                            <div class="text-danger">{{ profile_form.email.errors }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Your email address for notifications and account recovery</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.business_name.id_for_label }}" class="form-label">
+                                            <i class="bi bi-shop me-1"></i>Business Name
+                                        </label>
+                                        {{ profile_form.business_name }}
+                                        {% if profile_form.business_name.errors %}
+                                            <div class="text-danger">{{ profile_form.business_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.description.id_for_label }}" class="form-label">
+                                            <i class="bi bi-text-paragraph me-1"></i>Business Description
+                                        </label>
+                                        {{ profile_form.description }}
+                                        {% if profile_form.description.errors %}
+                                            <div class="text-danger">{{ profile_form.description.errors }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Describe your services and what makes your business special</div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ profile_form.location.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-geo-alt me-1"></i>Business Location
+                                                </label>
+                                                {{ profile_form.location }}
+                                                {% if profile_form.location.errors %}
+                                                    <div class="text-danger">{{ profile_form.location.errors }}</div>
+                                                {% endif %}
+                                                <div class="form-text">Your business address or location</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ profile_form.phone.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-telephone me-1"></i>Contact Phone
+                                                </label>
+                                                {{ profile_form.phone }}
+                                                {% if profile_form.phone.errors %}
+                                                    <div class="text-danger">{{ profile_form.phone.errors }}</div>
+                                                {% endif %}
+                                                <div class="form-text">Your contact phone number</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ profile_form.timing.id_for_label }}" class="form-label">
+                                            <i class="bi bi-clock me-1"></i>Business Hours
+                                        </label>
+                                        {{ profile_form.timing }}
+                                        {% if profile_form.timing.errors %}
+                                            <div class="text-danger">{{ profile_form.timing.errors }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Your business operating hours (e.g., 9:00 AM - 8:00 PM)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" id="save_profile_btn" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                                    <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Information & Statistics -->
+            <div class="col-lg-4">
+                <!-- Account Info -->
+                <div class="account-card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-person me-2"></i>Account Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="account-info">
+                            <div class="info-item">
+                                <span class="info-label">Username:</span>
+                                <span class="info-value">{{ user.username }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">{{ user.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Member Since:</span>
+                                <span class="info-value">{{ user.date_joined|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Last Login:</span>
+                                <span class="info-value">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Statistics -->
+                <div class="stats-card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-graph-up me-2"></i>Activity Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h6>{{ total_searches }}</h6>
+                                <p>Marketing Texts Generated</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="bi bi-image"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h6>{{ total_posters }}</h6>
+                                <p>Posters Generated</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="bi bi-camera-reels"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4 class="stat-number">{{ video_count }}</h4>
+                                <p class="stat-label">Videos Generated</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h6>{{ user.date_joined|timesince }}</h6>
+                                <p>Active Member</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Searches -->
+                {% if recent_searches %}
+                <div class="recent-searches-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Recent Searches
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for search in recent_searches %}
+                        <div class="search-item">
+                            <div class="search-text">{{ search.search_query }}</div>
+                            <small class="text-muted">{{ search.created_at|timesince }} ago</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Recent Posters -->
+                {% if recent_posters %}
+                <div class="recent-posters-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-image me-2"></i>Recent Posters
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for poster in recent_posters %}
+                        <div class="poster-item">
+                            <div class="poster-info">
+                                <div class="poster-name">{{ poster.promotion_name }}</div>
+                                <div class="poster-offer">{{ poster.offer_type }}</div>
+                                <small class="text-muted">{{ poster.created_at|timesince }} ago</small>
+                            </div>
+                            <div class="poster-preview">
+                                <img src="{{ poster.poster_url }}" alt="{{ poster.promotion_name }}" class="poster-thumbnail">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- View History Button -->
+                <div class="history-action-card">
+                    <div class="card-body text-center">
+                        <h6 class="mb-3">
+                            <i class="bi bi-clock-history me-2"></i>View Complete History
+                        </h6>
+                        <p class="text-muted mb-3">See all your poster generations, text creations, and logo uploads in one place</p>
+                        <a href="{% url 'user_history' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-clock-history me-1"></i>View My History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        padding: 2rem 0;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-title {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .profile-subtitle {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .profile-card, .account-card, .stats-card, .recent-searches-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 1rem 1rem 0 0 !important;
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .profile-image-section {
+        padding: 1rem;
+    }
+    
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid #dee2e6;
+    }
+    
+    .profile-placeholder {
+        width: 150px;
+        height: 150px;
+        background: #f8f9fa;
+        border: 3px dashed #dee2e6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 3rem;
+        color: #6c757d;
+    }
+    
+    .account-info .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+    }
+    
+    .stat-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+    
+    .stat-content h6 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+    }
+    
+    .stat-content p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .search-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .search-text {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .recent-posters-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .history-action-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .history-action-card .card-body {
+        padding: 2rem 1.5rem;
+    }
+    
+    .history-action-card h6 {
+        color: white;
+        font-weight: 600;
+    }
+    
+    .history-action-card p {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .poster-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .poster-info {
+        flex: 1;
+        margin-right: 1rem;
+    }
+    
+    .poster-name {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .poster-offer {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .poster-preview {
+        flex-shrink: 0;
+    }
+    
+    .poster-thumbnail {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        border: 2px solid #dee2e6;
+    }
+    
+    .btn-loading {
+        opacity: 0.8;
+        cursor: not-allowed;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-loading:hover {
+        opacity: 0.8;
+    }
+    
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+    }
+</style>
+
+<script>
+    const profileForm = document.getElementById("profile_form");
+    const saveProfileBtn = document.getElementById("save_profile_btn");
+    const profileSpinner = saveProfileBtn.querySelector(".spinner-border");
+
+    if (profileForm) {
+        profileForm.addEventListener('submit', function() {
+            console.log("✅ JavaScript: profile form submitting as POST");
+            
+            // Disable the button
+            saveProfileBtn.disabled = true;
+            
+            // Show spinner and change text
+            profileSpinner.classList.remove('d-none');
+            saveProfileBtn.innerHTML = saveProfileBtn.innerHTML.replace(
+                "Save Changes",
+                "Saving..."
+            );
+            
+            // Add loading class for visual feedback
+            saveProfileBtn.classList.add('btn-loading');
+            
+            // Optional: Add a small delay to show the animation
+            setTimeout(() => {
+                // The form will submit naturally
+            }, 100);
+        });
+    }
+</script>
+
+{% endblock %} 

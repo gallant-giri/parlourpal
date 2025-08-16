@@ -1,29 +1,282 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-
 {% block title %}Register - ParlorPal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        padding: 2rem 0;
+    }
+
+    .auth-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        padding: 3rem 2rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .auth-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: var(--text-gray);
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        background: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .section-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .input-group-text {
+        background: var(--white);
+        border: 2px solid #e9ecef;
+        border-right: none;
+        color: var(--text-gray);
+    }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(168, 139, 235, 0.25);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+
+    .input-group .input-group-text {
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-text {
+        color: var(--text-gray);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .auth-btn {
+        padding: 0.875rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e9ecef;
+    }
+
+    .auth-divider span {
+        background: var(--white);
+        padding: 0 1rem;
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    .auth-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .auth-link:hover {
+        color: var(--accent-color);
+        text-decoration: underline;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(168, 139, 235, 0.25);
+    }
+
+    .btn-loading {
+        opacity: 0.8;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .alert {
+        border-radius: var(--border-radius);
+        border: none;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    .alert-success {
+        background: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border-left: 4px solid #198754;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .auth-container {
+            padding: 1rem 0;
+        }
+
+        .auth-card {
+            padding: 2rem 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+        }
+
+        .auth-icon {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .auth-card {
+            padding: 1.5rem 1rem;
+        }
+
+        .form-section {
+            padding: 1rem;
+        }
+
+        .auth-title {
+            font-size: 1.5rem;
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
+            <div class="col-lg-8 col-md-10 col-sm-11">
                 <div class="auth-card">
                     <div class="text-center mb-4">
                         <i class="bi bi-scissors auth-icon"></i>
                         <h2 class="auth-title">Join ParlorPal</h2>
-                        <p class="auth-subtitle">Create your account and transform your salon's marketing</p>
+                        <p class="auth-subtitle">Create your account and transform your business's marketing</p>
                     </div>
 
-                    <form method="POST" class="auth-form"  id="register_form" enctype="multipart/form-data" novalidate>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" class="auth-form" id="register_form" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
 
                         {% if user_form.non_field_errors %}
-                            <div class="alert alert-danger">{{ user_form.non_field_errors }}</div>
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {{ user_form.non_field_errors }}
+                            </div>
                         {% endif %}
                         {% if profile_form.non_field_errors %}
-                            <div class="alert alert-danger">{{ profile_form.non_field_errors }}</div>
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {{ profile_form.non_field_errors }}
+                            </div>
                         {% endif %}
 
                         <!-- Personal Information -->
@@ -34,7 +287,9 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="username" class="form-label">Username</label>
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person me-1"></i>Username
+                                    </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="bi bi-person"></i>
@@ -45,13 +300,21 @@
                                                name="username"
                                                value="{{ user_form.username.value|default_if_none:'' }}"
                                                placeholder="Choose a username"
-                                               >
-                                        {{ user_form.username.errors }}
+                                               required>
                                     </div>
+                                    {% if user_form.username.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.username.errors %}
+                                                <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
+                                    <label for="email" class="form-label">
+                                        <i class="bi bi-envelope me-1"></i>Email Address
+                                    </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="bi bi-envelope"></i>
@@ -62,52 +325,65 @@
                                                name="email"
                                                value="{{ user_form.email.value|default_if_none:'' }}"
                                                placeholder="your@email.com"
-                                               >
-                                        {{ user_form.email.errors }}
+                                               required>
                                     </div>
+                                    {% if user_form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.email.errors %}
+                                                <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="password" class="form-label">Password</label>
+                                    <label for="password1" class="form-label">
+                                        <i class="bi bi-lock me-1"></i>Password
+                                    </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="bi bi-lock"></i>
                                         </span>
                                         <input type="password" 
-                                        class="form-control" 
-                                        id="password1" 
-                                        name="password1" 
-                                        placeholder="Create a password">
-                                        {% comment %} <input type="password"
-                                               class="form-control"
-                                               id="password"
-                                               name="password"
-                                               placeholder="Create a strong password"
-                                             > {% endcomment %}
-                                        {{ user_form.password.errors }}
+                                               class="form-control" 
+                                               id="password1" 
+                                               name="password1" 
+                                               placeholder="Create a password"
+                                               required>
                                     </div>
+                                    {% if user_form.password1.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.password1.errors %}
+                                                <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                                    <label for="password2" class="form-label">
+                                        <i class="bi bi-lock-fill me-1"></i>Confirm Password
+                                    </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="bi bi-lock-fill"></i>
                                         </span>
                                         <input type="password" 
-                                        class="form-control" 
-                                        id="password2" 
-                                        name="password2" 
-                                        placeholder="Confirm your password">
-                                        {% comment %} <input type="password"
-                                               class="form-control"
-                                               id="confirmPassword"
-                                               name="confirm_password"
+                                               class="form-control" 
+                                               id="password2" 
+                                               name="password2" 
                                                placeholder="Confirm your password"
-                                               > {% endcomment %}
+                                               required>
                                     </div>
+                                    {% if user_form.password2.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.password2.errors %}
+                                                <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -119,7 +395,9 @@
                             </h5>
 
                             <div class="mb-3">
-                                <label for="businessName" class="form-label">Business Name</label>
+                                <label for="businessName" class="form-label">
+                                    <i class="bi bi-shop me-1"></i>Business Name
+                                </label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-shop"></i>
@@ -129,51 +407,63 @@
                                            id="businessName"
                                            name="business_name"
                                            value="{{ profile_form.business_name.value|default_if_none:'' }}"
-                                           placeholder="e.g., Bella's Beauty Salon"
-                                           >
-                                    {{ profile_form.business_name.errors }}
+                                           placeholder="e.g., TechFix Mobile Solutions"
+                                           required>
                                 </div>
+                                {% if profile_form.business_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.business_name.errors %}
+                                            <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="businessDescription" class="form-label">Business Description</label>
+                                <label for="businessDescription" class="form-label">
+                                    <i class="bi bi-info-circle me-1"></i>Business Description
+                                </label>
                                 <textarea class="form-control"
                                           id="businessDescription"
                                           name="description"
                                           rows="3"
-                                          placeholder="Tell us about your salon... What services do you offer? What makes you special?"
-                                          >{{ profile_form.description.value|default_if_none:'' }}</textarea>
-                                {{ profile_form.description.errors }}
+                                          placeholder="Tell us about your business... What services do you offer? What makes you special?"
+                                          required>{{ profile_form.description.value|default_if_none:'' }}</textarea>
+                                {% if profile_form.description.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.description.errors %}
+                                            <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="businessImage" class="form-label">Business Logo/Image</label>
+                                <label for="businessImage" class="form-label">
+                                    <i class="bi bi-image me-1"></i>Business Logo/Image
+                                </label>
                                 <input type="file"
                                        class="form-control"
                                        id="businessImage"
                                        name="image"
                                        accept="image/*">
-                                {{ profile_form.image.errors }}
+                                {% if profile_form.image.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.image.errors %}
+                                            <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="form-text">
-                                    Upload your salon's logo or a photo (optional)
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Upload your business logo or a photo (optional)
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="terms" name="terms" >
-                            <label class="form-check-label" for="terms">
-                                I agree to the <a href="#" class="auth-link">Terms of Service</a> and
-                                <a href="#" class="auth-link">Privacy Policy</a>
-                            </label>
-                            <div class="invalid-feedback">
-                                You must agree to the terms and conditions.
-                            </div>
-                        </div>
-
-                        <button type="submit" id = "register_submit" class="btn btn-primary w-100 auth-btn">
+                        <button type="submit" id="register_submit" class="btn btn-primary w-100 auth-btn">
                             <i class="bi bi-person-plus me-2"></i>
-                            Create Account
+                            <span class="btn-text">Create Account</span>
                             <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -194,14 +484,68 @@
         </div>
     </div>
 </div>
+
 <script>
-    const form = document.getElementById("register_form");
-    if (form) {
-    form.addEventListener('submit', () => {
-        console.log("✅ JavaScript: form submitting as POST");
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById("register_form");
+        const submitButton = document.getElementById("register_submit");
+        const spinner = submitButton.querySelector(".spinner-border");
+        const btnText = submitButton.querySelector(".btn-text");
+
+        // Form submission handling
+        if (form) {
+            form.addEventListener('submit', function() {
+                console.log("✅ JavaScript: form submitting as POST");
+                
+                // Disable the button
+                submitButton.disabled = true;
+                
+                // Show spinner and change text
+                spinner.classList.remove("d-none");
+                btnText.textContent = "Creating Account...";
+                
+                // Add loading class for visual feedback
+                submitButton.classList.add("btn-loading");
+            });
+        }
+
+        // Form validation
+        const inputs = form.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+
+        // Password confirmation validation
+        const password1 = document.getElementById('password1');
+        const password2 = document.getElementById('password2');
+
+        if (password1 && password2) {
+            function validatePassword() {
+                if (password2.value && password1.value !== password2.value) {
+                    password2.setCustomValidity("Passwords don't match");
+                    password2.classList.add('is-invalid');
+                } else {
+                    password2.setCustomValidity('');
+                    password2.classList.remove('is-invalid');
+                }
+            }
+
+            password1.addEventListener('change', validatePassword);
+            password2.addEventListener('keyup', validatePassword);
+        }
     });
-}
-
 </script>
-
 {% endblock %}

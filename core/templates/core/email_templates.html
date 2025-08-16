@@ -1,0 +1,350 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Email Templates - ParlorPal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(168, 139, 235, 0.15);
+    }
+
+    .template-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .template-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-right: 1rem;
+    }
+
+    .verification-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .festival-icon {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        color: white;
+    }
+
+    .template-info h3 {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 700;
+    }
+
+    .template-info p {
+        margin: 0.5rem 0 0 0;
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    .template-description {
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .template-features {
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        color: var(--text-gray);
+    }
+
+    .feature-list li i {
+        color: var(--primary-color);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .template-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-preview {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(168, 139, 235, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-dark), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-gray);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .usage-stats {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(168, 139, 235, 0.05);
+        border-radius: 10px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">📧 Email Templates</h1>
+        <p class="page-subtitle">
+            Preview and manage all email templates used by ParlorPal. These templates are automatically sent to users for verification and festival notifications.
+        </p>
+    </div>
+
+    <!-- Usage Statistics -->
+    <div class="usage-stats">
+        <h4 class="mb-3">
+            <i class="bi bi-graph-up me-2"></i>Template Usage Statistics
+        </h4>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Active Templates</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Auto-Sending</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Mobile Responsive</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">🎨</div>
+                <div class="stat-label">Professional Design</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Templates -->
+    <div class="row">
+        <!-- Verification Email Template -->
+        <div class="col-lg-6">
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon verification-icon">
+                        <i class="bi bi-envelope-check"></i>
+                    </div>
+                    <div class="template-info">
+                        <h3>Email Verification</h3>
+                        <p>Sent to new users during registration</p>
+                    </div>
+                </div>
+                
+                <div class="template-description">
+                    A welcoming email that helps new users verify their email address and unlock all features of ParlorPal. Includes engaging content about the platform's capabilities.
+                </div>
+                
+                <div class="template-features">
+                    <h6 class="mb-2">Features:</h6>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle"></i>One-click email verification</li>
+                        <li><i class="bi bi-check-circle"></i>Platform feature highlights</li>
+                        <li><i class="bi bi-check-circle"></i>Professional branding</li>
+                        <li><i class="bi bi-check-circle"></i>Mobile-optimized design</li>
+                    </ul>
+                </div>
+                
+                <div class="template-actions">
+                    <a href="{% url 'preview_verification_email' %}" class="btn-preview">
+                        <i class="bi bi-eye"></i>Preview Template
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <i class="bi bi-gear"></i>Edit Template
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Festival Notification Template -->
+        <div class="col-lg-6">
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-icon festival-icon">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <div class="template-info">
+                        <h3>Festival Notification</h3>
+                        <p>Sent to users before important festivals</p>
+                    </div>
+                </div>
+                
+                <div class="template-description">
+                    Timely notifications about upcoming festivals with marketing tips and direct links to create festival-specific content and posters.
+                </div>
+                
+                <div class="template-features">
+                    <h6 class="mb-2">Features:</h6>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle"></i>Festival countdown timer</li>
+                        <li><i class="bi bi-check-circle"></i>Marketing tips included</li>
+                        <li><i class="bi bi-check-circle"></i>Direct action buttons</li>
+                        <li><i class="bi bi-check-circle"></i>Unsubscribe option</li>
+                    </ul>
+                </div>
+                
+                <div class="template-actions">
+                    <a href="{% url 'preview_festival_notification' %}" class="btn-preview">
+                        <i class="bi bi-eye"></i>Preview Template
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <i class="bi bi-gear"></i>Edit Template
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Management Info -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="template-card">
+                <h4 class="mb-3">
+                    <i class="bi bi-info-circle me-2"></i>Template Management
+                </h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>How Templates Work:</h6>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-arrow-right"></i>Verification emails are sent automatically when users register</li>
+                            <li><i class="bi bi-arrow-right"></i>Festival notifications are sent based on configured festival dates</li>
+                            <li><i class="bi bi-arrow-right"></i>Templates use dynamic variables for personalization</li>
+                            <li><i class="bi bi-arrow-right"></i>All emails are mobile-responsive and professionally designed</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Template Variables:</h6>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-code"></i>{{ user.username }} - User's display name</li>
+                            <li><i class="bi bi-code"></i>{{ user.email }} - User's email address</li>
+                            <li><i class="bi bi-code"></i>{{ site_name }} - Platform name (ParlorPal)</li>
+                            <li><i class="bi bi-code"></i>{{ verification_url }} - Email verification link</li>
+                            <li><i class="bi bi-code"></i>{{ festival.name }} - Festival name (for notifications)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

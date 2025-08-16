@@ -1,0 +1,105 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Insights - ParlorPal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 mb-2"><i class="bi bi-bar-chart"></i> Insights</h1>
+            <p class="lead text-muted">See your marketing activity and trends at a glance.</p>
+        </div>
+    </div>
+    <div class="row mb-4 g-4">
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                <div class="stat-icon mb-2"><i class="bi bi-images fs-2 text-primary"></i></div>
+                <h3>{{ poster_count }}</h3>
+                <p class="mb-0">Posters Generated</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                <div class="stat-icon mb-2"><i class="bi bi-text-paragraph fs-2 text-success"></i></div>
+                <h3>{{ text_count }}</h3>
+                <p class="mb-0">Texts Created</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                <div class="stat-icon mb-2"><i class="bi bi-shop fs-2 text-warning"></i></div>
+                <h3>{{ logo_count }}</h3>
+                <p class="mb-0">Logos Uploaded</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4 bg-white rounded shadow-sm">
+                <div class="stat-icon mb-2"><i class="bi bi-activity fs-2 text-info"></i></div>
+                <h3>{{ total_activities }}</h3>
+                <p class="mb-0">Total Activities</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-camera-reels"></i>
+                </div>
+                <div class="stat-content">
+                    <h4 class="stat-number">{{ video_count }}</h4>
+                    <p class="stat-label">Videos Generated</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card p-4 shadow-sm">
+                <h5 class="mb-4"><i class="bi bi-graph-up-arrow me-2"></i>Poster Generation Trend (Last 30 Days)</h5>
+                <canvas id="posterTrendChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="trend-data" type="application/json">{{ trend_data_json|safe }}</script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('posterTrendChart').getContext('2d');
+    const trendData = JSON.parse(document.getElementById('trend-data').textContent);
+    const labels = trendData.map(function(item) { return item.date; });
+    const data = trendData.map(function(item) { return item.count; });
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Posters Generated',
+                data: data,
+                fill: true,
+                borderColor: '#7c3aed',
+                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#7c3aed',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: { display: true, title: { display: false } },
+                y: { display: true, beginAtZero: true, title: { display: false } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

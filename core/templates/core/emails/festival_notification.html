@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ festival.name }} is coming! - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .festival-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .festival-info {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff8e1 100%);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .festival-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        .festival-date {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .countdown {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .action-buttons {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .action-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .secondary-button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        }
+        .tips-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .tips-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .tip-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+        .tip-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            margin-right: 12px;
+        }
+        .tip-text {
+            font-size: 15px;
+            color: #555;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 25px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .unsubscribe {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        .unsubscribe a {
+            color: #999;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .action-button {
+                margin: 5px 0;
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="festival-icon">
+                {% if notification_type == 'festival-day' %}🎉{% else %}🎊{% endif %}
+            </div>
+            <h1>
+                {% if notification_type == 'festival-day' %}
+                    Happy {{ festival.name }}!
+                {% else %}
+                    {{ festival.name }} is Coming!
+                {% endif %}
+            </h1>
+            <p>
+                {% if notification_type == 'festival-day' %}
+                    Celebrate and boost your business with special festival content!
+                {% else %}
+                    Time to boost your business with amazing marketing content!
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="content">
+            <div style="font-size: 18px; margin-bottom: 20px; color: #555;">
+                Hi <strong>{{ user.username }}</strong>,<br><br>
+                {% if notification_type == 'festival-day' %}
+                    🎉 <strong>{{ festival.name }}</strong> is here today! It's the perfect day to celebrate and create special festival content for your business!
+                {% else %}
+                    Great news! <strong>{{ festival.name }}</strong> is just around the corner, and it's the perfect time to create engaging marketing content for your business!
+                {% endif %}
+            </div>
+            
+            <div class="festival-info">
+                <div class="festival-name">{{ festival.name }}</div>
+                <div class="festival-date">{{ festival.date|date:"l, F d, Y" }}</div>
+                <div class="countdown">
+                    ⏰ {{ countdown_text|default:"Only "|add:festival.notification_days|add:" days to go!" }}
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{{ site_url }}/ai/" class="action-button">✨ Generate Festival Content</a>
+                <a href="{{ site_url }}/generate_poster/" class="action-button secondary-button">🎨 Create Festival Poster</a>
+            </div>
+            
+            <div class="tips-section">
+                <h3>💡 Marketing Tips for {{ festival.name }}:</h3>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">🎯</div>
+                    <div class="tip-text">Create festival-specific offers and promotions</div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">📱</div>
+                    <div class="tip-text">Share content on social media with relevant hashtags</div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">🎨</div>
+                    <div class="tip-text">Use festive colors and themes in your designs</div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">⏰</div>
+                    <div class="tip-text">Post content 2-3 days before the festival for maximum reach</div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">📈</div>
+                    <div class="tip-text">Track engagement and adjust your strategy accordingly</div>
+                </div>
+            </div>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #667eea; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <strong>🚀 Pro Tip:</strong> Use our AI content generator to create festival-specific captions and our poster designer to make eye-catching promotional materials that will attract more customers!
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ site_name }}</strong> - Your AI Marketing Buddy</p>
+            <p>Transform your business with intelligent marketing solutions</p>
+            <div style="margin: 15px 0;">
+                <a href="{{ site_url }}/dashboard/" style="color: #667eea; text-decoration: none; margin: 0 10px;">Dashboard</a> | 
+                <a href="{{ site_url }}/profile/" style="color: #667eea; text-decoration: none; margin: 0 10px;">Profile</a> | 
+                <a href="#" style="color: #667eea; text-decoration: none; margin: 0 10px;">Support</a>
+            </div>
+            <div class="unsubscribe">
+                <a href="{{ site_url }}/unsubscribe/{{ user.id }}/">Unsubscribe from festival notifications</a>
+            </div>
+            <p style="font-size: 12px; color: #999; margin-top: 15px;">
+                This email was sent to {{ user.email }} because you have festival notifications enabled.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

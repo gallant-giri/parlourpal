@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .verification-box {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .verify-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .verify-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .features {
+            margin: 30px 0;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px 0;
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+        .feature-text {
+            font-size: 16px;
+            color: #555;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 25px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .social-links {
+            margin: 15px 0;
+        }
+        .social-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome to {{ site_name }}!</h1>
+            <p>Your AI Marketing Buddy for Business Growth</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-text">
+                Hi <strong>{{ user.username }}</strong>,<br><br>
+                Thank you for joining {{ site_name }}! To complete your registration and unlock all features, please verify your email address.
+            </div>
+            
+            <div class="verification-box">
+                <h3>📧 Email Verification Required</h3>
+                <p>Click the button below to verify your email address and start creating amazing marketing content!</p>
+                <a href="{{ verification_url }}" class="verify-button">✅ Verify My Email</a>
+                <p style="font-size: 14px; color: #666; margin-top: 15px;">
+                    If the button doesn't work, copy and paste this link:<br>
+                    <a href="{{ verification_url }}" style="color: #667eea; word-break: break-all;">{{ verification_url }}</a>
+                </p>
+            </div>
+            
+            <div class="features">
+                <h3>🚀 What you'll unlock after verification:</h3>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">✨</div>
+                    <div class="feature-text">AI-powered marketing content generation</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-text">Professional poster design tools</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">Festival notification alerts</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-text">Business growth analytics</div>
+                </div>
+            </div>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #667eea; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <strong>💡 Pro Tip:</strong> After verification, you can enable festival notifications to get timely reminders for marketing opportunities during important celebrations!
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ site_name }}</strong> - Your AI Marketing Buddy</p>
+            <p>Transform your business with intelligent marketing solutions</p>
+            <div class="social-links">
+                <a href="#">Website</a> | <a href="#">Support</a> | <a href="#">Privacy Policy</a>
+            </div>
+            <p style="font-size: 12px; color: #999; margin-top: 15px;">
+                This email was sent to {{ user.email }}. If you didn't create an account, you can safely ignore this email.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

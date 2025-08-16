@@ -1,0 +1,97 @@
+{% extends "core/base.html" %}
+{% block title %}Generate Video{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">AI Video Generator</h2>
+    <form method="post" class="mb-4" id="videoForm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="campaign_name" class="form-label">Campaign Name</label>
+            <select class="form-select" id="campaign_name" name="campaign_name">
+                <option value="Summer Promo">Summer Promo</option>
+                <option value="Festive Offer">Festive Offer</option>
+                <option value="Bridal Special">Bridal Special</option>
+                <option value="New Launch">New Launch</option>
+                <option value="Other">Custom</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="campaign_name_custom" name="campaign_name_custom" placeholder="Enter custom campaign name" style="display:none;">
+        </div>
+        <div class="mb-3">
+            <label for="theme" class="form-label">Theme</label>
+            <select class="form-select" id="theme" name="theme">
+                <option value="Bridal">Bridal</option>
+                <option value="Festive">Festive</option>
+                <option value="Modern">Modern</option>
+                <option value="Classic">Classic</option>
+                <option value="Other">Custom</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="theme_custom" name="theme_custom" placeholder="Enter custom theme" style="display:none;">
+        </div>
+        <div class="mb-3">
+            <label for="aspect_ratio" class="form-label">Aspect Ratio</label>
+            <select class="form-select" id="aspect_ratio" name="aspect_ratio">
+                <option value="16:9">16:9 (Landscape)</option>
+                <option value="9:16">9:16 (Portrait)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="script" class="form-label">Script/Idea</label>
+            <textarea class="form-control" id="script" name="script" rows="3" placeholder="Describe your video idea or script..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="generateBtn">Generate Video</button>
+    </form>
+    <div id="loadingSpinner" class="text-center my-3" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="mt-2 text-muted">Generating your video. This may take a few minutes...</div>
+    </div>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    {% if video_url %}
+        <h4>Generated Video:</h4>
+        <video width="100%" height="auto" controls>
+            <source src="{{ video_url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    {% endif %}
+</div>
+<script>
+// Show/hide custom input for Campaign Name
+const campaignSelect = document.getElementById('campaign_name');
+const campaignCustom = document.getElementById('campaign_name_custom');
+campaignSelect.addEventListener('change', function() {
+    campaignCustom.style.display = this.value === 'Other' ? 'block' : 'none';
+    if (this.value !== 'Other') campaignCustom.value = '';
+});
+// Show/hide custom input for Theme
+const themeSelect = document.getElementById('theme');
+const themeCustom = document.getElementById('theme_custom');
+themeSelect.addEventListener('change', function() {
+    themeCustom.style.display = this.value === 'Other' ? 'block' : 'none';
+    if (this.value !== 'Other') themeCustom.value = '';
+});
+// On submit, use custom values if provided, show spinner, and disable button
+const form = document.getElementById('videoForm');
+const spinner = document.getElementById('loadingSpinner');
+const generateBtn = document.getElementById('generateBtn');
+form.addEventListener('submit', function(e) {
+    if (campaignSelect.value === 'Other') {
+        campaignSelect.value = campaignCustom.value;
+    }
+    if (themeSelect.value === 'Other') {
+        themeSelect.value = themeCustom.value;
+    }
+    spinner.style.display = 'block';
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
+});
+// Hide spinner and re-enable button after page load (when results or error are shown)
+window.addEventListener('DOMContentLoaded', function() {
+    spinner.style.display = 'none';
+    generateBtn.disabled = false;
+    generateBtn.textContent = 'Generate Video';
+});
+</script>
+{% endblock %} 

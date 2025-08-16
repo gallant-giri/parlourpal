@@ -1,0 +1,182 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Chatbot - ParlorPal{% endblock %}
+
+{% block content %}
+<style>
+    .chat-bubble {
+        display: inline-block;
+        padding: 0.75rem 1.1rem;
+        border-radius: 1.2rem;
+        max-width: 80%;
+        margin-bottom: 0.25rem;
+        white-space: pre-line;
+        word-break: break-word;
+        font-size: 1rem;
+        line-height: 1.5;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        animation: fadeIn 0.3s;
+    }
+    .chat-bubble.user {
+        background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        color: #3730a3;
+        align-self: flex-end;
+        text-align: right;
+    }
+    .chat-bubble.bot {
+        background: #f3f4f6;
+        color: #111827;
+        align-self: flex-start;
+        text-align: left;
+    }
+    .chat-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 0.5rem;
+    }
+    .chat-row.user {
+        justify-content: flex-end;
+    }
+    .chat-row.bot {
+        justify-content: flex-start;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: none; }
+    }
+    #chatWindow {
+        background: #f8fafc;
+        border-radius: 0 0 0.5rem 0.5rem;
+        padding: 1.2rem 1rem 1rem 1rem;
+        min-height: 400px;
+        max-height: 60vh;
+        overflow-y: auto;
+        font-family: 'Poppins', sans-serif;
+    }
+</style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-robot fs-3 me-2"></i>
+                    <h4 class="mb-0">AI Chatbot</h4>
+                </div>
+                <div class="card-body" id="chatWindow">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="card-footer bg-light">
+                    <form id="chatForm" class="d-flex align-items-center" method="post">
+                        {% csrf_token %}
+                        <input type="text" id="chatInput" class="form-control me-2" placeholder="Type your message..." autocomplete="off" required>
+                        <button type="button" id="voiceBtn" class="btn btn-outline-secondary me-2" title="Voice input">
+                            <i class="bi bi-mic" id="micIcon"></i>
+                        </button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send</button>
+                    </form>
+                    <div id="voiceStatus" class="text-muted small mt-1" style="display:none;">
+                        <i class="bi bi-record-circle text-danger"></i> Listening...
+                    </div>
+                    <div id="chatLoading" class="text-center mt-2" style="display:none;">
+                        <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                        <span class="ms-2 text-muted">AI is thinking...</span>
+                    </div>
+                    <div id="chatError" class="alert alert-danger mt-2 py-1 px-2" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatWindow = document.getElementById('chatWindow');
+const chatLoading = document.getElementById('chatLoading');
+const chatError = document.getElementById('chatError');
+const voiceBtn = document.getElementById('voiceBtn');
+const micIcon = document.getElementById('micIcon');
+const voiceStatus = document.getElementById('voiceStatus');
+let recognition;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = '';
+    voiceBtn.onclick = function(e) {
+        e.preventDefault();
+        recognition.lang = '';
+        recognition.start();
+    };
+    recognition.onstart = function() {
+        voiceStatus.style.display = 'block';
+        micIcon.classList.add('text-danger');
+    };
+    recognition.onend = function() {
+        voiceStatus.style.display = 'none';
+        micIcon.classList.remove('text-danger');
+    };
+    recognition.onerror = function(event) {
+        voiceStatus.style.display = 'none';
+        micIcon.classList.remove('text-danger');
+        alert('Voice input error: ' + event.error);
+    };
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        chatInput.value = transcript;
+    };
+} else {
+    voiceBtn.style.display = 'none';
+}
+
+function appendMessage(text, sender) {
+    const row = document.createElement('div');
+    row.className = 'chat-row ' + sender;
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + sender;
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    // Animate and scroll
+    setTimeout(() => {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }, 100);
+}
+
+chatForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const userMsg = chatInput.value.trim();
+    if (!userMsg) return;
+    appendMessage(userMsg, 'user');
+    chatInput.value = '';
+    chatError.style.display = 'none';
+    chatLoading.style.display = 'block';
+    // Send AJAX request
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new URLSearchParams({ message: userMsg })
+    })
+    .then(response => response.json())
+    .then(data => {
+        chatLoading.style.display = 'none';
+        if (data.success) {
+            appendMessage(data.reply, 'bot');
+        } else {
+            chatError.textContent = data.error || 'Something went wrong.';
+            chatError.style.display = 'block';
+        }
+    })
+    .catch(err => {
+        chatLoading.style.display = 'none';
+        chatError.textContent = 'Network error. Please try again.';
+        chatError.style.display = 'block';
+    });
+});
+</script>
+{% endblock %} 

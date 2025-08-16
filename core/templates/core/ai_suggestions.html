@@ -1,319 +1,479 @@
 {% extends "core/base.html" %}
-{% block title %}Marketing Text Generator{% endblock %}
+{% load static %}
 
-{% block content %}
+{% block title %}AI Content Generator - ParlorPal{% endblock %}
 
-<div class="container mt-5">
-    <br>
-    <h2>Hello {{ user.username }} 👋</h2>
-    <p>Your business: <strong>{{ profile.business_name }}</strong></p>
-    <h5>Your buiness description</h5>
-    <p>{{ profile.description }}</p>
+{% block extra_css %}
+<style>
+    .ai-container {
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        min-height: calc(100vh - 160px);
+    }
 
-    <form method="post" class="mt-4">
-        {% csrf_token %}
-        
-        <!-- 📣 What to promote -->
-        <div class="mb-3">
-            <label for="user_input" class="form-label"><b>What do you want to promote today?<b></label>
-            <input type="text" name="user_input" id="user_input" class="form-control"
-                   placeholder="e.g., Bridal Offers, Monsoon Discounts" required>
-        </div>
+    .ai-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
 
-        <!-- 🌐 Language -->
-        <div class="mb-3">
-            <label for="language" class="form-label">Choose Language:</label>
-            <select name="language" id="language" class="form-select">
-                <option value="english">English</option>
-                <option value="kannada">Kannada</option>
-            </select>
-        </div>
+    .ai-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
 
-        <!-- 📏 Length -->
-        <div class="mb-3">
-            <label for="length" class="form-label">Select Length:</label>
-            <select name="length" id="length" class="form-select">
-                <option value="small">Small (1-2 lines)</option>
-                <option value="medium">Medium (a short paragraph)</option>
-                <option value="long">Long (2 short paragraphs)</option>
-            </select>
-        </div>
+    .ai-title {
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
 
-        <!-- ✅ Submit Button -->
-        <button class="btn btn-success">
-            🎯 Generate Marketing Text
-        </button>
-    </form>
+    .ai-subtitle {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        color: var(--text-gray);
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-    {% if marketing_text %}
-<div class="card p-3 mt-4 bg-light border">
-    <div class="d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Generated Marketing Text:</h5>
-        <button onclick="copyText()" class="btn btn-outline-secondary btn-sm">
-            📋 Copy
-        </button>
-    </div>
-    <p id="marketingText" class="mt-3">{{ marketing_text }}</p>
-</div>
+    .ai-form-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
 
-<!-- Hidden textarea to use for clipboard -->
-<textarea id="hiddenText" style="opacity: 0; position: absolute; left: -9999px;"></textarea>
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
 
-<script>
-function copyText() {
-    const text = document.getElementById("marketingText").innerText;
-    const hiddenField = document.getElementById("hiddenText");
-    hiddenField.value = text;
-    hiddenField.select();
-    document.execCommand("copy");
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
 
-    // Optional alert or toast
-    alert("✅ Copied to clipboard!");
-}
-</script>
-{% endif %}
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(168, 139, 235, 0.25);
+    }
 
+    .form-text {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
 
-    {% comment %} {% if marketing_text %}
-    <div class="card p-3 mt-4 bg-light border">
-        <h5>Generated Marketing Text:</h5>
-        <p>{{ marketing_text }}</p>
-    </div>
-    {% endif %} {% endcomment %}
-</div>
+    .generate-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+        color: var(--white);
+        padding: 0.875rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .generate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        color: var(--white);
+    }
+
+    .generate-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .result-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .result-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .copy-btn {
+        background: var(--bg-light);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+
+    .copy-btn:hover {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+
+    .result-content {
+        padding: 1.5rem;
+        background: var(--bg-light);
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+        white-space: pre-wrap;
+    }
+
+    .tips-section {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+    }
+
+    .tips-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+
+    .tip-item i {
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        border-bottom: 1px solid rgba(168, 139, 235, 0.1);
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .modal-title {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 2rem;
+        background: var(--bg-light);
+    }
+
+    .modal-content-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-dark);
+        white-space: pre-wrap;
+        background: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(168, 139, 235, 0.1);
+        box-shadow: var(--shadow-light);
+    }
+
+    .modal-footer {
+        background: var(--white);
+        border-top: 1px solid rgba(168, 139, 235, 0.1);
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+
+    .modal-footer .btn {
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .modal-footer .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .ai-container {
+            padding: 1rem 0;
+        }
+
+        .ai-form-card {
+            padding: 1.5rem;
+        }
+
+        .result-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .ai-icon {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .ai-form-card {
+            padding: 1rem;
+        }
+
+        .ai-title {
+            font-size: 1.8rem;
+        }
+
+        .ai-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+        }
+    }
+</style>
 {% endblock %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} {% extends "core/base.html" %}
-{% load static %}
-{% block title %}AI Assistant - ParlorPal{% endblock %}
-
 {% block content %}
-<div class="ai-suggestions-container">
+<div class="ai-container">
     <div class="container">
-        <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-12">
+        <!-- Header -->
                 <div class="ai-header">
-                    <div class="text-center">
-                        <div class="ai-icon-large">
-                            <i class="bi bi-robot"></i>
-                        </div>
-                        <h1 class="ai-title">AI Marketing Assistant</h1>
-                        <p class="ai-subtitle">
-                            Tell me about your marketing needs and I'll create compelling content for your salon
-                        </p>
-                    </div>
-                </div>
+            <div class="ai-icon">
+                <i class="bi bi-magic"></i>
             </div>
+            <h1 class="ai-title">✨ AI Content Generator</h1>
+            <p class="ai-subtitle">
+                Create engaging marketing content for your business in seconds. 
+                Our AI understands your brand and crafts perfect captions for social media.
+            </p>
         </div>
 
-        <!-- Input Form Section -->
-        <div class="row justify-content-center mb-4">
+        <!-- Main Form -->
+        <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="ai-input-card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-chat-dots me-2"></i>What can I help you create today?
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="aiSuggestionForm" method="post">
+                <div class="ai-form-card">
+                    <form method="post" id="ai_form">
                             {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="prompt" class="form-label">Describe your marketing needs</label>
-                                <textarea class="form-control ai-textarea" 
-                                          id="prompt" 
-                                          name="prompt" 
-                                          rows="4" 
-                                          placeholder="Example: Create a social media post for our new summer nail art collection, or help me write a promotional email for our holiday spa packages..."
-                                          required></textarea>
-                                <div class="form-text">
-                                    Be as specific as possible for better results!
-                                </div>
+                        
+                        <!-- Promotion Name -->
+                        <div class="mb-3">
+                            <label for="promotion_name" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                Promotion Name
+                            </label>
+                            <input type="text" 
+                                   name="promotion_name" 
+                                   id="promotion_name" 
+                                   class="form-control" 
+                                   placeholder="e.g., Mega Sale, Festival Bonanza, New Customer Special, Anniversary Celebration"
+                                   required>
+                        </div>
+
+                        <!-- Offer Type -->
+                        <div class="mb-3">
+                            <label for="offer_type" class="form-label">
+                                <i class="bi bi-gift me-1"></i>
+                                What do you want to promote?
+                            </label>
+                            <select class="form-select" name="offer_type" id="offer_type" required>
+                                <option value="">-- Select Offer Type --</option>
+                                <optgroup label="🎯 Discount Offers">
+                                    <option value="50% OFF">50% OFF</option>
+                                    <option value="40% OFF">40% OFF</option>
+                                    <option value="30% OFF">30% OFF</option>
+                                    <option value="25% OFF">25% OFF</option>
+                                    <option value="20% OFF">20% OFF</option>
+                                    <option value="15% OFF">15% OFF</option>
+                                    <option value="10% OFF">10% OFF</option>
+                                    <option value="Flat ₹500 OFF">Flat ₹500 OFF</option>
+                                    <option value="Flat ₹300 OFF">Flat ₹300 OFF</option>
+                                    <option value="Flat ₹200 OFF">Flat ₹200 OFF</option>
+                                    <option value="Flat ₹100 OFF">Flat ₹100 OFF</option>
+                                    <option value="Flat ₹50 OFF">Flat ₹50 OFF</option>
+                                </optgroup>
+                                <optgroup label="🎁 Buy & Get Offers">
+                                    <option value="Buy One Get One Free">Buy One Get One Free</option>
+                                    <option value="Buy Two Get One Free">Buy Two Get One Free</option>
+                                    <option value="Buy One Get 50% OFF">Buy One Get 50% OFF</option>
+                                    <option value="Buy One Get 30% OFF">Buy One Get 30% OFF</option>
+                                    <option value="Buy One Get 20% OFF">Buy One Get 20% OFF</option>
+                                </optgroup>
+                                <optgroup label="🆓 Free Services">
+                                    <option value="Free Consultation">Free Consultation</option>
+                                    <option value="Free Demo">Free Demo</option>
+                                    <option value="Free Trial">Free Trial</option>
+                                    <option value="Free Installation">Free Installation</option>
+                                    <option value="Free Delivery">Free Delivery</option>
+                                    <option value="Free Setup">Free Setup</option>
+                                    <option value="Free Training">Free Training</option>
+                                    <option value="Free Assessment">Free Assessment</option>
+                                </optgroup>
+                                <optgroup label="📦 Package Deals">
+                                    <option value="Combo Package">Combo Package</option>
+                                    <option value="Starter Package">Starter Package</option>
+                                    <option value="Premium Package">Premium Package</option>
+                                    <option value="Family Package">Family Package</option>
+                                    <option value="Corporate Package">Corporate Package</option>
+                                    <option value="Student Package">Student Package</option>
+                                    <option value="Senior Citizen Package">Senior Citizen Package</option>
+                                </optgroup>
+                                <optgroup label="🎄 Seasonal Offers">
+                                    <option value="Diwali Special">Diwali Special</option>
+                                    <option value="Christmas Special">Christmas Special</option>
+                                    <option value="New Year Special">New Year Special</option>
+                                    <option value="Holi Special">Holi Special</option>
+                                    <option value="Raksha Bandhan Special">Raksha Bandhan Special</option>
+                                    <option value="Independence Day Special">Independence Day Special</option>
+                                    <option value="Republic Day Special">Republic Day Special</option>
+                                    <option value="Monsoon Special">Monsoon Special</option>
+                                    <option value="Summer Special">Summer Special</option>
+                                    <option value="Winter Special">Winter Special</option>
+                                </optgroup>
+                                <optgroup label="👑 Membership & Loyalty">
+                                    <option value="VIP Membership">VIP Membership</option>
+                                    <option value="Premium Membership">Premium Membership</option>
+                                    <option value="Loyalty Program">Loyalty Program</option>
+                                    <option value="Referral Bonus">Referral Bonus</option>
+                                    <option value="Early Bird Offer">Early Bird Offer</option>
+                                    <option value="First Time Customer">First Time Customer</option>
+                                </optgroup>
+                                <optgroup label="🏢 Business Specific">
+                                    <option value="Grand Opening">Grand Opening</option>
+                                    <option value="Anniversary Sale">Anniversary Sale</option>
+                                    <option value="Clearance Sale">Clearance Sale</option>
+                                    <option value="Stock Clearance">Stock Clearance</option>
+                                    <option value="End of Season Sale">End of Season Sale</option>
+                                    <option value="Flash Sale">Flash Sale</option>
+                                    <option value="Midnight Sale">Midnight Sale</option>
+                                    <option value="Weekend Special">Weekend Special</option>
+                                </optgroup>
+                                <optgroup label="✏️ Custom">
+                                    <option value="Other">Other (Custom Offer)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- Custom Offer -->
+                        <div class="mb-3" id="custom_offer_div" style="display: none;">
+                            <label for="custom_offer" class="form-label">
+                                <i class="bi bi-pencil me-1"></i>
+                                Enter Your Custom Offer
+                            </label>
+                            <input type="text" 
+                                   name="custom_offer" 
+                                   id="custom_offer" 
+                                   class="form-control" 
+                                   placeholder="Describe your custom offer">
+                        </div>
+
+                        <!-- Language -->
+                        <div class="mb-3">
+                            <label for="language" class="form-label">
+                                <i class="bi bi-translate me-1"></i>
+                                Language
+                            </label>
+                            <select class="form-select" name="language" id="language" required>
+                                <option value="English" selected>English</option>
+                                <option value="Kannada">Kannada</option>
+                                <option value="Hindi">Hindi</option>
+                            </select>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button type="submit" id="generate_btn" class="btn generate-btn">
+                            <i class="bi bi-magic me-2"></i>
+                            <span class="btn-text">Generate Suggestions</span>
+                            <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Content Type</label>
-                                <div class="content-type-options">
-                                    <input type="radio" class="btn-check" name="contentType" id="social" value="social" checked>
-                                    <label class="btn btn-outline-primary" for="social">
-                                        <i class="bi bi-share me-1"></i>Social Media
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="contentType" id="email" value="email">
-                                    <label class="btn btn-outline-primary" for="email">
-                                        <i class="bi bi-envelope me-1"></i>Email Marketing
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="contentType" id="promotion" value="promotion">
-                                    <label class="btn btn-outline-primary" for="promotion">
-                                        <i class="bi bi-megaphone me-1"></i>Promotion
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="contentType" id="general" value="general">
-                                    <label class="btn btn-outline-primary" for="general">
-                                        <i class="bi bi-chat-text me-1"></i>General Copy
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100 ai-generate-btn">
-                                <i class="bi bi-magic me-2"></i>
-                                Generate AI Content
-                                <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                        </button>
+                    </form>
         </div>
 
-        <!-- Quick Templates Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="quick-templates">
-                    <h5 class="mb-3">
-                        <i class="bi bi-lightning me-2"></i>Quick Templates
-                    </h5>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="template-card" data-template="Create a social media post about our new hair styling services">
-                                <div class="template-icon">
-                                    <i class="bi bi-scissors"></i>
-                                </div>
-                                <h6>Hair Services</h6>
-                                <p>Promote new styling services</p>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="template-card" data-template="Write a promotional email for our spa packages and relaxation treatments">
-                                <div class="template-icon">
-                                    <i class="bi bi-flower1"></i>
-                                </div>
-                                <h6>Spa Packages</h6>
-                                <p>Email campaign for spa services</p>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="template-card" data-template="Create content for our seasonal nail art collection and trending designs">
-                                <div class="template-icon">
-                                    <i class="bi bi-palette"></i>
-                                </div>
-                                <h6>Nail Art</h6>
-                                <p>Showcase nail designs</p>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 col-lg-3 mb-3">
-                            <div class="template-card" data-template="Write copy for our holiday promotions and special offers">
-                                <div class="template-icon">
-                                    <i class="bi bi-gift"></i>
-                                </div>
-                                <h6>Holiday Promos</h6>
-                                <p>Seasonal marketing copy</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Results Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="ai-results-card d-none" id="aiResults">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-stars me-2"></i>AI Generated Content
+                <!-- Results Section (Hidden initially, shown after popup) -->
+                <div id="resultsSection" class="result-card" style="display: none;">
+                    <div class="result-header">
+                        <h5 class="result-title">
+                            <i class="bi bi-stars me-2"></i>
+                            Generated Content
                         </h5>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copyResult">
-                            <i class="bi bi-clipboard me-1"></i>Copy
+                        <button onclick="copyText()" class="btn copy-btn">
+                            <i class="bi bi-clipboard me-1"></i>
+                            Copy
                         </button>
                     </div>
-                    <div class="card-body">
-                        <div class="ai-content-preview">
-                            <div class="loading-animation text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Generating content...</span>
-                                </div>
-                                <p class="mt-3 text-muted">Our AI is crafting amazing content for you...</p>
-                            </div>
-                            
-                            <div class="generated-content d-none">
-                                <div class="content-type-badge">
-                                    <i class="bi bi-share me-1"></i>
-                                    <span id="contentTypeBadge">Social Media Post</span>
-                                </div>
-                                
-                                <div class="content-text" id="generatedText">
-                                    <!-- AI generated content will appear here -->
-                                    <h6>✨ Transform Your Look This Season! ✨</h6>
-                                    <p>Ready for a fresh new style? Our expert stylists are here to help you discover your perfect look! 💇‍♀️</p>
-                                    <p>🌟 New services now available:<br>
-                                    ✓ Balayage & Highlights<br>
-                                    ✓ Keratin Treatments<br>
-                                    ✓ Creative Color Corrections<br>
-                                    ✓ Precision Cuts & Styling</p>
-                                    <p>Book your appointment today and let us make you feel absolutely radiant! 💫</p>
-                                    <p class="hashtags">#SalonLife #HairTransformation #BeautyGoals #NewLook #BookNow</p>
-                                </div>
-                                
-                                <div class="content-actions">
-                                    <button type="button" class="btn btn-outline-primary" onclick="regenerateContent()">
-                                        <i class="bi bi-arrow-clockwise me-1"></i>Regenerate
-                                    </button>
-                                    <button type="button" class="btn btn-outline-success" onclick="saveContent()">
-                                        <i class="bi bi-heart me-1"></i>Save Favorite
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <div class="result-content" id="marketingText"></div>
         </div>
 
         <!-- Tips Section -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="tips-section">
+                <div class="tips-section mt-4">
                     <h6 class="tips-title">
-                        <i class="bi bi-lightbulb me-2"></i>Tips for better AI results
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Tips for Better Results
                     </h6>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="tip-item">
-                                <i class="bi bi-check-circle text-success"></i>
-                                <span>Be specific about your services and target audience</span>
+                                <i class="bi bi-check-circle"></i>
+                                <span>Be specific about your offer</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="tip-item">
-                                <i class="bi bi-check-circle text-success"></i>
-                                <span>Mention any special offers or promotions</span>
+                                <i class="bi bi-check-circle"></i>
+                                <span>Mention target audience</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="tip-item">
-                                <i class="bi bi-check-circle text-success"></i>
-                                <span>Include the tone you want (professional, fun, elegant)</span>
+                                <i class="bi bi-check-circle"></i>
+                                <span>Include special promotions</span>
                             </div>
                         </div>
                     </div>
@@ -322,4 +482,189 @@ function copyText() {
         </div>
     </div>
 </div>
-{% endblock %} {% endcomment %}
+
+<!-- Popup Modal for Generated Content -->
+<div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contentModalLabel">
+                    <i class="bi bi-stars me-2"></i>
+                    ✨ Your Generated Content
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content-text" id="modalContentText"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary" onclick="copyModalText()">
+                    <i class="bi bi-clipboard me-1"></i>
+                    Copy Content
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden textarea for copying -->
+<textarea id="hiddenText" style="opacity: 0; position: absolute; left: -9999px;"></textarea>
+
+<!-- Server-generated content variable -->
+{% if marketing_text %}
+<script>
+    var serverGeneratedContent = "{{ marketing_text|escapejs }}";
+</script>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiForm = document.getElementById("ai_form");
+    const generateBtn = document.getElementById("generate_btn");
+    const btnText = generateBtn.querySelector(".btn-text");
+    const spinner = generateBtn.querySelector(".spinner-border");
+    const contentModal = new bootstrap.Modal(document.getElementById('contentModal'));
+    const resultsSection = document.getElementById('resultsSection');
+    const marketingText = document.getElementById('marketingText');
+    const modalContentText = document.getElementById('modalContentText');
+    const offerTypeSelect = document.getElementById('offer_type');
+    const customOfferDiv = document.getElementById('custom_offer_div');
+
+    // Check if there's generated content from server (for page refresh)
+    if (typeof serverGeneratedContent !== 'undefined' && serverGeneratedContent && serverGeneratedContent.trim() !== "") {
+        showContentInModal(serverGeneratedContent);
+        showContentBelow(serverGeneratedContent);
+    }
+
+    // Form submission handling
+    if (aiForm) {
+        aiForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Disable button
+            generateBtn.disabled = true;
+            
+            // Show spinner and change text
+            spinner.classList.remove("d-none");
+            btnText.textContent = "Generating...";
+            
+            // Add loading class
+            generateBtn.classList.add("btn-loading");
+            
+            // Get form data
+            const formData = new FormData(aiForm);
+            
+            // Send AJAX request
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Show content in popup first
+                    showContentInModal(data.marketing_text);
+                    // Also show content below
+                    showContentBelow(data.marketing_text);
+                } else {
+                    alert('Error generating content. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error generating content. Please try again. Check console for details.');
+            })
+            .finally(() => {
+                // Re-enable button
+                generateBtn.disabled = false;
+                
+                // Hide spinner and restore text
+                spinner.classList.add("d-none");
+                btnText.textContent = "Generate Content";
+                
+                // Remove loading class
+                generateBtn.classList.remove("btn-loading");
+            });
+        });
+    }
+
+    // Function to show content in modal
+    function showContentInModal(content) {
+        modalContentText.textContent = content;
+        contentModal.show();
+    }
+
+    // Function to show content below the form
+    function showContentBelow(content) {
+        marketingText.textContent = content;
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Handle modal close event
+    document.getElementById('contentModal').addEventListener('hidden.bs.modal', function () {
+        // Content is already shown below, no need to do anything
+    });
+
+    // Copy function for modal
+    window.copyModalText = function() {
+        const text = modalContentText.textContent;
+        const hiddenField = document.getElementById("hiddenText");
+        hiddenField.value = text;
+        hiddenField.select();
+        document.execCommand("copy");
+        
+        // Show feedback
+        const copyBtn = document.querySelector('.modal-footer .btn-primary');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+        }, 2000);
+    };
+
+    // Copy function for results section
+    window.copyText = function() {
+        const text = document.getElementById("marketingText").innerText;
+        const hiddenField = document.getElementById("hiddenText");
+        hiddenField.value = text;
+        hiddenField.select();
+        document.execCommand("copy");
+        
+        // Show feedback
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        copyBtn.style.background = 'var(--primary-color)';
+        copyBtn.style.color = 'var(--white)';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '';
+            copyBtn.style.color = '';
+        }, 2000);
+    };
+
+    // Handle offer type change to show/hide custom offer input
+    if (offerTypeSelect) {
+        offerTypeSelect.addEventListener('change', function() {
+            customOfferDiv.style.display = this.value === 'Other' ? 'block' : 'none';
+        });
+    }
+});
+</script>
+{% endblock %}

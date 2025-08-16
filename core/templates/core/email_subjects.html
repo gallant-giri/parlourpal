@@ -1,0 +1,106 @@
+{% extends "core/base.html" %}
+{% block title %}Email Subject Line Generator{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Email Subject Line Generator</h2>
+    <form method="post" class="mb-4" id="subjectForm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="offer" class="form-label">Offer or Campaign</label>
+            <select class="form-select" id="offer" name="offer">
+                <option value="Summer Sale">Summer Sale</option>
+                <option value="Festival Discount">Festival Discount</option>
+                <option value="New Service Launch">New Service Launch</option>
+                <option value="Referral Bonus">Referral Bonus</option>
+                <option value="Anniversary Offer">Anniversary Offer</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="offer_custom" name="offer_custom" placeholder="Enter custom offer/campaign" style="display:none;">
+        </div>
+        <div class="mb-3">
+            <label for="audience" class="form-label">Target Audience</label>
+            <select class="form-select" id="audience" name="audience">
+                <option value="Brides-to-be">Brides-to-be</option>
+                <option value="Families">Families</option>
+                <option value="Students">Students</option>
+                <option value="Professionals">Professionals</option>
+                <option value="Seniors">Seniors</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="audience_custom" name="audience_custom" placeholder="Enter custom audience" style="display:none;">
+        </div>
+        <div class="mb-3">
+            <label for="tone" class="form-label">Tone</label>
+            <select class="form-select" id="tone" name="tone">
+                <option value="Exciting">Exciting</option>
+                <option value="Professional">Professional</option>
+                <option value="Friendly">Friendly</option>
+                <option value="Luxurious">Luxurious</option>
+                <option value="Fun">Fun</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="tone_custom" name="tone_custom" placeholder="Enter custom tone" style="display:none;">
+        </div>
+        <button type="submit" class="btn btn-primary">Generate Subject Lines</button>
+    </form>
+    <div id="loadingSpinner" class="text-center my-3" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="mt-2 text-muted">Generating subject lines...</div>
+    </div>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    {% if subject_lines %}
+        <h4>Generated Subject Lines:</h4>
+        <ul class="list-group">
+            {% for line in subject_lines %}
+                <li class="list-group-item">{{ line }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+<script>
+// Show/hide custom input for Offer
+const offerSelect = document.getElementById('offer');
+const offerCustom = document.getElementById('offer_custom');
+offerSelect.addEventListener('change', function() {
+    offerCustom.style.display = this.value === 'Other' ? 'block' : 'none';
+    if (this.value !== 'Other') offerCustom.value = '';
+});
+// Show/hide custom input for Audience
+const audienceSelect = document.getElementById('audience');
+const audienceCustom = document.getElementById('audience_custom');
+audienceSelect.addEventListener('change', function() {
+    audienceCustom.style.display = this.value === 'Other' ? 'block' : 'none';
+    if (this.value !== 'Other') audienceCustom.value = '';
+});
+// Show/hide custom input for Tone
+const toneSelect = document.getElementById('tone');
+const toneCustom = document.getElementById('tone_custom');
+toneSelect.addEventListener('change', function() {
+    toneCustom.style.display = this.value === 'Other' ? 'block' : 'none';
+    if (this.value !== 'Other') toneCustom.value = '';
+});
+// On submit, use custom values if provided and show spinner
+const form = document.getElementById('subjectForm');
+const spinner = document.getElementById('loadingSpinner');
+form.addEventListener('submit', function(e) {
+    if (offerSelect.value === 'Other') {
+        offerSelect.value = offerCustom.value;
+    }
+    if (audienceSelect.value === 'Other') {
+        audienceSelect.value = audienceCustom.value;
+    }
+    if (toneSelect.value === 'Other') {
+        toneSelect.value = toneCustom.value;
+    }
+    spinner.style.display = 'block';
+});
+// Hide spinner after page load (when results or error are shown)
+window.addEventListener('DOMContentLoaded', function() {
+    spinner.style.display = 'none';
+});
+</script>
+{% endblock %} 

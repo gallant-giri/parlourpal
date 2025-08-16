@@ -1,0 +1,504 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}My History - ParlorPal{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="history-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="history-title">
+                                <i class="bi bi-clock-history me-2"></i>My Activity History
+                            </h1>
+                            <p class="history-subtitle">
+                                Track all your poster generations, text creations, and logo uploads
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left me-1"></i>Back to Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-images"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ poster_count }}</h3>
+                        <p>Posters Generated</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-text-paragraph"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ text_count }}</h3>
+                        <p>Texts Created</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-shop"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ logo_count }}</h3>
+                        <p>Logos Uploaded</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_activities }}</h3>
+                        <p>Total Activities</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="filter-card">
+                    <div class="filter-header">
+                        <h5><i class="bi bi-funnel me-2"></i>Filter Activities</h5>
+                    </div>
+                    <div class="filter-body">
+                        <div class="btn-group mb-3" role="group" aria-label="Filter history by action type">
+                            <a href="?" class="btn btn-outline-primary{% if not current_filter %} active{% endif %}">All</a>
+                            <a href="?action_type=poster_generation" class="btn btn-outline-primary{% if current_filter == 'poster_generation' %} active{% endif %}">Posters Generated</a>
+                            <a href="?action_type=text_generation" class="btn btn-outline-primary{% if current_filter == 'text_generation' %} active{% endif %}">Texts Created</a>
+                            <a href="?action_type=logo_upload" class="btn btn-outline-primary{% if current_filter == 'logo_upload' %} active{% endif %}">Logos Uploaded</a>
+                            <a href="?action_type=video_generation" class="btn btn-outline-primary{% if current_filter == 'video_generation' %} active{% endif %}">Videos Generated</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Timeline -->
+        <div class="row">
+            <div class="col-12">
+                {% if user_history %}
+                <div class="timeline">
+                    {% for activity in user_history %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            {% if activity.action_type == 'poster_generation' %}
+                                <i class="bi bi-image"></i>
+                            {% elif activity.action_type == 'text_generation' %}
+                                <i class="bi bi-text-paragraph"></i>
+                            {% elif activity.action_type == 'logo_upload' %}
+                                <i class="bi bi-shop"></i>
+                            {% elif activity.action_type == 'video_generation' %}
+                                <i class="bi bi-camera-video"></i>
+                            {% endif %}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="activity-header">
+                                <h6 class="activity-title">
+                                    {{ activity.get_action_type_display }}
+                                </h6>
+                                <span class="activity-time">{{ activity.created_at|timesince }} ago</span>
+                            </div>
+                            
+                            <!-- Input Details -->
+                            <div class="input-details">
+                                <h6>Input Details:</h6>
+                                <div class="input-grid">
+                                    {% for key, value in activity.input_data.items %}
+                                    <div class="input-item">
+                                        <strong>{{ key|title }}:</strong> {{ value }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Output Display -->
+                            <div class="output-display">
+                                <h6>Output:</h6>
+                                {% if activity.is_image_action %}
+                                    <!-- Image Display -->
+                                    <div class="image-output">
+                                        <img src="{{ activity.output_data }}" alt="Generated Image" class="activity-image">
+                                        <div class="image-actions">
+                                            <a href="{{ activity.output_data }}" target="_blank" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye me-1"></i>View Full Size
+                                            </a>
+                                            <button onclick="copyToClipboard('{{ activity.output_data }}')" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-clipboard me-1"></i>Copy URL
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <!-- Text Display -->
+                                    <div class="text-output">
+                                        <div class="generated-text">{{ activity.output_data }}</div>
+                                        <button onclick="copyToClipboard('{{ activity.output_data }}')" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-clipboard me-1"></i>Copy Text
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Prompt Used (if available) -->
+                            {% if activity.prompt_used %}
+                            <div class="prompt-details">
+                                <h6>AI Prompt Used:</h6>
+                                <div class="prompt-text">{{ activity.prompt_used|truncatewords:50 }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h4>No Activities Yet</h4>
+                    <p>Start generating posters and texts to see your activity history here!</p>
+                    <div class="empty-actions">
+                        <a href="{% url 'generate_poster' %}" class="btn btn-primary">
+                            <i class="bi bi-image me-1"></i>Generate Poster
+                        </a>
+                        <a href="{% url 'ai_suggestions' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-magic me-1"></i>Create Text
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .history-container {
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-light), var(--white));
+        min-height: calc(100vh - 160px);
+    }
+    
+    .history-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .history-title {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .history-subtitle {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .stat-card {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+    
+    .stat-content h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+    
+    .stat-content p {
+        margin: 0.5rem 0 0 0;
+        color: var(--text-gray);
+    }
+    
+    .filter-card {
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .filter-header {
+        background: var(--bg-light);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .filter-header h5 {
+        margin: 0;
+        color: var(--text-dark);
+    }
+    
+    .filter-body {
+        padding: 1.5rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -2.5rem;
+        top: 1.5rem;
+        width: 3rem;
+        height: 3rem;
+        background: var(--white);
+        border: 3px solid #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        font-size: 1.2rem;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        padding: 1.5rem;
+    }
+    
+    .activity-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .activity-title {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .activity-time {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+    }
+    
+    .input-details, .output-display, .prompt-details {
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-details h6, .output-display h6, .prompt-details h6 {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .input-item {
+        background: var(--bg-light);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .image-output {
+        text-align: center;
+    }
+    
+    .activity-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .image-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .text-output {
+        background: var(--bg-light);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .generated-text {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .prompt-text {
+        background: var(--bg-light);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-family: monospace;
+        font-size: 0.9rem;
+        color: var(--text-gray);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--bg-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 3rem;
+        color: var(--text-gray);
+    }
+    
+    .empty-state h4 {
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state p {
+        color: var(--text-gray);
+        margin-bottom: 2rem;
+    }
+    
+    .empty-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .timeline {
+            padding-left: 1rem;
+        }
+        
+        .timeline-marker {
+            left: -1.5rem;
+            width: 2rem;
+            height: 2rem;
+            font-size: 1rem;
+        }
+        
+        .activity-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .input-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .image-actions {
+            flex-direction: column;
+        }
+        
+        .empty-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        button.classList.add('btn-success');
+        button.classList.remove('btn-outline-primary');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-primary');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy to clipboard');
+    });
+}
+</script>
+{% endblock %} 

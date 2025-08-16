@@ -11,17 +11,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+# from decouple import config  # This import doesn't exist
 
 import os
 from dotenv import load_dotenv
 
+
 load_dotenv()  # 🔐 Load the .env file
 
 # ...
-
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-
+GOOGLE_VERTEX_API_KEY = os.getenv("GOOGLE_VERTEX_API_KEY")
+VERTEX_IMAGE_ENDPOINT = os.getenv("VERTEX_IMAGE_ENDPOINT")
+GCP_PROJECT_ID= os.getenv("GCP_PROJECT_ID")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,7 +42,7 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True  # Set to True for development to serve media files
 
 
 ALLOWED_HOSTS = ['*']
@@ -182,3 +187,15 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Email Configuration (Gmail SMTP - FREE 500 emails/day)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('GMAIL_USER', 'your-gmail@gmail.com')  # Set in .env file
+EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD', 'your-app-password')  # Set in .env file
+DEFAULT_FROM_EMAIL = os.getenv('GMAIL_USER', 'your-gmail@gmail.com')  # Set in .env file
+
+# Site URL for email links
+SITE_URL = 'http://127.0.0.1:8000'  # Change to your domain in production

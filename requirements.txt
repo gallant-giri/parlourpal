@@ -8,21 +8,38 @@ python-dotenv
 # Cloudinary for image storage
 cloudinary
 
-# Cohere API (AI marketing text)
+# AI APIs
 cohere
-
-# OpenAI client (if you're using GPT)
 openai
+vertexai
 
-# Pillow for image and poster generation
+# Image processing
 Pillow
 
-# Optional: If switching to PostgreSQL later on Render
+# Database support (for Railway PostgreSQL)
 psycopg2-binary
-
-# Optional: If you plan to use dj-database-url for Render DB_URL parsing
 dj-database-url
 
-cloudinary
-python-dotenv
+# Static file serving
 whitenoise
+
+# HTTP requests and API dependencies
+requests
+httpx
+urllib3
+certifi
+
+# Google Cloud dependencies (for Vertex AI)
+google-cloud-aiplatform
+google-auth
+google-api-core
+
+# AI/ML dependencies
+pydantic
+tokenizers
+fastavro
+huggingface-hub
+
+# Additional utilities
+six
+packaging

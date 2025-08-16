@@ -1,0 +1,125 @@
+{% extends "core/base.html" %}
+
+{% block title %}Create Business Profile - ParlorPal{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-store me-2"></i>
+                        Create Your Business Profile
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Welcome!</strong> To use our AI marketing tools, we need some information about your business.
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ profile_form.business_name.id_for_label }}" class="form-label">
+                                <i class="fas fa-building me-1"></i>
+                                Business Name *
+                            </label>
+                            {{ profile_form.business_name }}
+                            {% if profile_form.business_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.business_name.errors %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ profile_form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Business Description *
+                            </label>
+                            {{ profile_form.description }}
+                            {% if profile_form.description.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.description.errors %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Describe your services, specialties, and what makes your business unique.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ profile_form.image.id_for_label }}" class="form-label">
+                                <i class="fas fa-image me-1"></i>
+                                Business Logo (Optional)
+                            </label>
+                            {{ profile_form.image }}
+                            {% if profile_form.image.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.image.errors %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Upload your business logo or a representative image.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>
+                                Create Profile & Continue
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %} 
