@@ -536,10 +536,12 @@ DESIGN GUIDELINES:
 - Highlight the promotion name and main offer with bold and attractive fonts
 - Use colors and typography that match the business theme
 - Include relevant visuals or illustrations:
-  - If {business_type} is "salon" or "beauty parlour", include an elegant image of a woman based on the culture of the business name to show beauty services
+  - If {business_type} is "salon" or "beauty parlour", 
+  include an elegant image of a woman (Make sure the woman is fully clothed in a traditional or professional outfit, modest and elegant, suitable for a beauty parlour advertisement. Avoid sexualized or revealing imagery.) based on the culture of the business name to show beauty services
   - Otherwise, avoid human faces and use visuals/icons that match the business type (e.g., tools, tech, food)
 - Keep the layout clean and easy to read on mobile
 - Add marketing elements like badges, stickers, or call-to-action text (e.g., "Call Now", "Limited Offer", "Visit Today")
+- Ensure the design remains professional, family-friendly, and suitable for public social media marketing.
 
 POSTER GOAL:
 - Should look modern, polished, and shareable
